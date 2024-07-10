@@ -14,11 +14,17 @@ namespace codecrafters_redis
             _server = new TcpListener(ipAddress, port);
         }
 
-        public void Start()
+        public async void Start()
         {
             _server.Start();
             Socket clientSocket = _server.AcceptSocket();
-            clientSocket.SendAsync(Encoding.UTF8.GetBytes("+PONG\r\n"));
+            // await clientSocket.SendAsync(Encoding.UTF8.GetBytes("+PONG\r\n"));
+            while (clientSocket.Connected)
+            {
+                byte[] buffer = new byte[1024];
+                await clientSocket.ReceiveAsync(buffer);
+                await clientSocket.SendAsync(Encoding.UTF8.GetBytes("+PONG\r\n"));
+            }
         }
 
         public void Stop()
