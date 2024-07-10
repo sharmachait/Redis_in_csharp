@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace codecrafters_redis
 {
@@ -14,17 +15,36 @@ namespace codecrafters_redis
             _server = new TcpListener(ipAddress, port);
         }
 
-        public async Task Start()
+        public async Task StartAsync()
         {
             _server.Start();
+            Console.WriteLine("Server started...");
+
             while (true)
             {
-                Socket clientSocket =await _server.AcceptSocketAsync();
-                while (clientSocket.Connected)
+                var clientSocket = await _server.AcceptSocketAsync();
+                _ = HandleClientAsync(clientSocket); // Run each client handler in a separate task
+            }
+        }
+
+        private async Task HandleClientAsync(Socket clientSocket)
+        {
+            Console.WriteLine("Client connected");
+
+            while (clientSocket.Connected)
+            {
+                var buffer = new byte[1024];
+                var byteCount = await clientSocket.ReceiveAsync(new ArraySegment<byte>(buffer), SocketFlags.None);
+
+                if (byteCount > 0)
                 {
-                    byte[] buffer = new byte[1024];
-                    await clientSocket.ReceiveAsync(buffer);
-                    await clientSocket.SendAsync(Encoding.ASCII.GetBytes("+PONG\r\n"));
+                    Console.WriteLine("Received data from client");
+                    await clientSocket.SendAsync(new ArraySegment<byte>(Encoding.ASCII.GetBytes("+PONG\r\n")), SocketFlags.None);
+                }
+                else
+                {
+                    Console.WriteLine("Client disconnected");
+                    clientSocket.Close();
                 }
             }
         }
@@ -32,15 +52,16 @@ namespace codecrafters_redis
         public void Stop()
         {
             _server.Stop();
+            Console.WriteLine("Server stopped");
         }
     }
 
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             TcpServer server = new TcpServer(IPAddress.Any, 6379);
-            server.Start();
+            await server.StartAsync();
         }
     }
 }
