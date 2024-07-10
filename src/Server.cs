@@ -1,12 +1,46 @@
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-TcpListener server = new TcpListener(IPAddress.Any, 6379);
-server.Start();
-var clientSocket = server.AcceptSocket(); // wait for client
 
-while (clientSocket.Connected) {
-    var buffer = new byte[1024];
-    await clientSocket.ReceiveAsync(buffer);
-    await clientSocket.SendAsync(Encoding.ASCII.GetBytes("+PONG\r\n"));
+namespace codecrafters_redis
+{
+    class TcpServer
+    {
+        private readonly TcpListener _server;
+
+        public TcpServer(IPAddress ipAddress, int port)
+        {
+            _server = new TcpListener(ipAddress, port);
+        }
+
+        public async void Start()
+        {
+            _server.Start();
+            while (_server.Pending())
+            {
+                Socket clientSocket =await _server.AcceptSocketAsync();
+                while (clientSocket.Connected)
+                {
+                    byte[] buffer = new byte[1024];
+                    await clientSocket.ReceiveAsync(buffer);
+                    await clientSocket.SendAsync(Encoding.ASCII.GetBytes("+PONG\r\n"));
+                }
+            }
+        }
+
+        public void Stop()
+        {
+            _server.Stop();
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            TcpServer server = new TcpServer(IPAddress.Any, 6379);
+            server.Start();
+        }
+    }
 }
