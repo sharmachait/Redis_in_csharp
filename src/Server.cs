@@ -14,10 +14,10 @@ namespace codecrafters_redis
             _server = new TcpListener(ipAddress, port);
         }
 
-        public async void Start()
+        public async Task Start()
         {
             _server.Start();
-            while (_server.Pending())
+            while (true)
             {
                 Socket clientSocket =await _server.AcceptSocketAsync();
                 while (clientSocket.Connected)
