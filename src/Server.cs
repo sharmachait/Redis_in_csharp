@@ -18,7 +18,7 @@ namespace codecrafters_redis
         {
             _server.Start();
             Socket clientSocket = _server.AcceptSocket();
-            // await clientSocket.SendAsync(Encoding.UTF8.GetBytes("+PONG\r\n"));
+            await clientSocket.SendAsync(Encoding.UTF8.GetBytes("+PONG\r\n"));
             while (clientSocket.Connected)
             {
                 byte[] buffer = new byte[1024];
