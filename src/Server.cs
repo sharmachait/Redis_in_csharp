@@ -1,8 +1,6 @@
-using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace codecrafters_redis
 {
@@ -23,28 +21,21 @@ namespace codecrafters_redis
             while (true)
             {
                 var clientSocket = await _server.AcceptSocketAsync();
-                _ = HandleClientAsync(clientSocket); // Run each client handler in a separate task
-            }
-        }
-
-        private async Task HandleClientAsync(Socket clientSocket)
-        {
-            Console.WriteLine("Client connected");
-
-            while (clientSocket.Connected)
-            {
-                var buffer = new byte[1024];
-                var byteCount = await clientSocket.ReceiveAsync(new ArraySegment<byte>(buffer), SocketFlags.None);
-
-                if (byteCount > 0)
+                while (clientSocket.Connected)
                 {
-                    Console.WriteLine("Received data from client");
-                    await clientSocket.SendAsync(new ArraySegment<byte>(Encoding.ASCII.GetBytes("+PONG\r\n")), SocketFlags.None);
-                }
-                else
-                {
-                    Console.WriteLine("Client disconnected");
-                    clientSocket.Close();
+                    var buffer = new byte[1024];
+                    var byteCount = await clientSocket.ReceiveAsync(new ArraySegment<byte>(buffer), SocketFlags.None);
+
+                    if (byteCount > 0)
+                    {
+                        Console.WriteLine("Received data from client");
+                        await clientSocket.SendAsync(new ArraySegment<byte>(Encoding.ASCII.GetBytes("+PONG\r\n")), SocketFlags.None);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Client disconnected");
+                        clientSocket.Close();
+                    }
                 }
             }
         }
@@ -52,7 +43,6 @@ namespace codecrafters_redis
         public void Stop()
         {
             _server.Stop();
-            Console.WriteLine("Server stopped");
         }
     }
 
