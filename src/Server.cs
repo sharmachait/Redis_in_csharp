@@ -40,7 +40,6 @@ namespace codecrafters_redis
                 {
                     byte[] buffer = new byte[1024];
                     await clientSocket.ReceiveAsync(buffer);
-
                     await clientSocket.SendAsync(Encoding.ASCII.GetBytes("+PONG\r\n"));
                 }
             }
@@ -54,7 +53,7 @@ namespace codecrafters_redis
         static async Task Main(string[] args)
         {
             TcpServer server = new TcpServer(IPAddress.Any, 6379);
-            await server.StartAsync();
+            await server.StartAsyncDoesntWork();
         }
     }
 }
