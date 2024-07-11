@@ -13,6 +13,21 @@ namespace codecrafters_redis
             _server = new TcpListener(ipAddress, port);
         }
 
+        public async Task StartAsyncDoesntWork()
+        {
+            _server.Start();
+            while (true)
+            {
+                Socket clientSocket =await _server.AcceptSocketAsync();
+                while (clientSocket.Connected)
+                {
+                    byte[] buffer = new byte[1024];
+                    await clientSocket.ReceiveAsync(buffer);
+                    await clientSocket.SendAsync(Encoding.ASCII.GetBytes("+PONG\r\n"));
+                }
+            }
+        }
+
         public async Task StartAsync()
         {
             _server.Start();
@@ -20,30 +35,18 @@ namespace codecrafters_redis
 
             while (true)
             {
-                var clientSocket = await _server.AcceptSocketAsync();
+                Socket clientSocket = await _server.AcceptSocketAsync();
                 while (clientSocket.Connected)
                 {
-                    var buffer = new byte[1024];
-                    var byteCount = await clientSocket.ReceiveAsync(new ArraySegment<byte>(buffer), SocketFlags.None);
+                    byte[] buffer = new byte[1024];
+                    await clientSocket.ReceiveAsync(buffer);
 
-                    if (byteCount > 0)
-                    {
-                        Console.WriteLine("Received data from client");
-                        await clientSocket.SendAsync(new ArraySegment<byte>(Encoding.ASCII.GetBytes("+PONG\r\n")), SocketFlags.None);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Client disconnected");
-                        clientSocket.Close();
-                    }
+                    await clientSocket.SendAsync(Encoding.ASCII.GetBytes("+PONG\r\n"));
                 }
             }
         }
 
-        public void Stop()
-        {
-            _server.Stop();
-        }
+
     }
 
     class Program
