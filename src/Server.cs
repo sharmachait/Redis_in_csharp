@@ -21,17 +21,16 @@ namespace codecrafters_redis
 
             while (true)
             {
-                Socket clientSocket = await _server.AcceptSocketAsync();
-                connectedSockets.Add(c++,clientSocket);
-                 ClientHandler(c);
+                Socket socket = await _server.AcceptSocketAsync();
+                HandleSocketAsync(socket);
             }
         }
 
-        public async Task ClientHandler(int key)
+        async Task HandleSocketAsync(Socket clientSocket)
         {
-            Socket clientSocket = connectedSockets[key];
-            while (clientSocket.Connected) {
-                var command = new byte[clientSocket.ReceiveBufferSize];
+            while (clientSocket.Connected)
+            {
+                byte[] command = new byte[clientSocket.ReceiveBufferSize];
                 await clientSocket.ReceiveAsync(command);
                 await clientSocket.SendAsync(Encoding.UTF8.GetBytes("+PONG\r\n"));
             }
