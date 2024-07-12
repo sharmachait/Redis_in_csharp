@@ -30,8 +30,7 @@ namespace codecrafters_redis
             {
                 var command = new byte[clientSocket.ReceiveBufferSize];
                 await clientSocket.ReceiveAsync(command);
-                await clientSocket.SendAsync(Encoding.UTF8.GetBytes("+PONG\r\n"),
-                    SocketFlags.None);
+                await clientSocket.SendAsync(Encoding.UTF8.GetBytes("+PONG\r\n"));
             }
         }
     }
