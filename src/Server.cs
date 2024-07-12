@@ -30,14 +30,11 @@ namespace codecrafters_redis
         public async Task ClientHandler(int key)
         {
             Socket clientSocket = connectedSockets[key];
-            while (clientSocket.Connected)
-            {
-                byte[] buffer = new byte[1024];
-                await clientSocket.ReceiveAsync(buffer);
-                await clientSocket.SendAsync(Encoding.ASCII.GetBytes("+PONG\r\n"));
+            while (clientSocket.Connected) {
+                var command = new byte[clientSocket.ReceiveBufferSize];
+                await clientSocket.ReceiveAsync(command);
+                await clientSocket.SendAsync(Encoding.UTF8.GetBytes("+PONG\r\n"));
             }
-            clientSocket.Dispose();
-            connectedSockets.Remove(key);
         }
     }
 
