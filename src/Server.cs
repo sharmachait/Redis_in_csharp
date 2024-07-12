@@ -15,12 +15,11 @@ namespace codecrafters_redis
         public async Task StartAsync()
         {
             _server.Start();
-            Console.WriteLine("Server started...");
 
             while (true)
             {
                 Socket clientSocket = await _server.AcceptSocketAsync();
-                HandleSocketAsync(clientSocket);
+                await HandleSocketAsync(clientSocket);
             }
         }
 
