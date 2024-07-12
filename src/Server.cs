@@ -7,8 +7,6 @@ namespace codecrafters_redis
     class TcpServer
     {
         private readonly TcpListener _server;
-        private Dictionary<int, Socket> connectedSockets = new Dictionary<int, Socket>();
-        private int c = 0;
         public TcpServer(IPAddress ipAddress, int port)
         {
             _server = new TcpListener(ipAddress, port);
@@ -22,22 +20,19 @@ namespace codecrafters_redis
             while (true)
             {
                 Socket clientSocket = await _server.AcceptSocketAsync();
-                connectedSockets.Add(c++,clientSocket);
-                await ClientHandler(c);
+                HandleSocketAsync(clientSocket);
             }
         }
 
-        public async Task ClientHandler(int key)
+        async Task HandleSocketAsync(Socket clientSocket)
         {
-            Socket clientSocket = connectedSockets[key];
             while (clientSocket.Connected)
             {
-                byte[] buffer = new byte[1024];
-                await clientSocket.ReceiveAsync(buffer);
-                await clientSocket.SendAsync(Encoding.ASCII.GetBytes("+PONG\r\n"));
+                var command = new byte[clientSocket.ReceiveBufferSize];
+                await clientSocket.ReceiveAsync(command);
+                await clientSocket.SendAsync(Encoding.UTF8.GetBytes("+PONG\r\n"),
+                    SocketFlags.None);
             }
-            clientSocket.Dispose();
-            connectedSockets.Remove(key);
         }
     }
 
