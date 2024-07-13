@@ -31,17 +31,8 @@ class TcpServer
             byte[] command = new byte[clientSocket.ReceiveBufferSize];
             await clientSocket.ReceiveAsync(command);
 
-            string result = Encoding.UTF8.GetString(command);
-            string[] lines = result.Split('\n');
-            Console.WriteLine("String Received: ");
-            Console.WriteLine(result);
-            Console.WriteLine("parts: ");
-            foreach (string line in lines)
-            {
-                Console.Write(line);
-            }
-
-            // await clientSocket.SendAsync(Encoding.UTF8.GetBytes("+PONG\r\n"));
+            RespParser parser = new RespParser(command);
+            Console.WriteLine(parser.GetCommand());
         }
     }
 }
