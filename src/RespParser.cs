@@ -29,7 +29,7 @@ public class RespParser
     {
         Console.WriteLine("Parsing...."+parts[0]);
         Console.WriteLine("Parsing...."+parts[0].Substring(1));
-        String len = parts[0].Substring(1, parts[0].Length);
+        String len = parts[0].Substring(1);
         Console.WriteLine("len: "+len);
         int length = int.Parse(len);
         Console.WriteLine("length: "+length);
