@@ -32,7 +32,8 @@ class TcpServer
             await clientSocket.ReceiveAsync(command);
 
             RespParser parser = new RespParser(command);
-            // Console.WriteLine(parser.GetCommand());
+            Console.WriteLine(parser.GetData());
+            parser.GetParts();
         }
     }
 }

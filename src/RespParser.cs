@@ -4,14 +4,27 @@ namespace codecrafters_redis;
 
 public class RespParser
 {
-    private String _command;
+    private String _data;
     public RespParser(byte[] command)
     {
-        _command = Encoding.UTF8.GetString(command);
+        _data = Encoding.UTF8.GetString(command);
     }
 
-    public String GetCommand()
+    public String GetData()
     {
-        return _command;
+        return _data;
+    }
+
+    public String[] GetParts()
+    {
+        String[] parts = _data.Split("\r\n");
+        Console.WriteLine("parts: ");
+        int c = 0;
+        foreach(String part in parts){
+            Console.WriteLine(c+": "+part);
+        }
+        return parts;
     }
 }
+
+
