@@ -32,7 +32,7 @@ class TcpServer
             await clientSocket.ReceiveAsync(command);
 
             string result = Encoding.UTF8.GetString(command);
-            Console.WriteLine("String got"+result);
+            Console.WriteLine("String got"+result.Substring(0,result.IndexOf('\n')));
             Console.WriteLine("String end");
 
             // await clientSocket.SendAsync(Encoding.UTF8.GetBytes("+PONG\r\n"));
