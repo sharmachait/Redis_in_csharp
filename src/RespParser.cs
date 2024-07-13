@@ -28,7 +28,7 @@ public class RespParser
 
     public void ParseArray(String[] parts)
     {
-        String len = parts[0].Substring(0, parts[0].Length);
+        String len = parts[0].Substring(1, parts[0].Length);
         int length = int.Parse(len);
         Console.WriteLine("length: "+length);
 
