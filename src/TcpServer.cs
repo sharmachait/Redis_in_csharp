@@ -28,10 +28,10 @@ class TcpServer
     {
         while (clientSocket.Connected)
         {
-            byte[] command = new byte[clientSocket.ReceiveBufferSize];
-            await clientSocket.ReceiveAsync(command);
+            byte[] buffer = new byte[clientSocket.ReceiveBufferSize];
+            await clientSocket.ReceiveAsync(buffer);
 
-            RespParser parser = new RespParser(command);
+            RespParser parser = new RespParser(buffer);
             String[] command = parser.GetCommand();
             Console.WriteLine("Command: ");
 
