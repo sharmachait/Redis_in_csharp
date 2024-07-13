@@ -33,13 +33,10 @@ class TcpServer
 
             RespParser parser = new RespParser(buffer);
             String[] command = parser.GetCommand();
-            Console.WriteLine("Command: ");
 
-            for (int i = 0; i < command.Length; i++)
-            {
-                Console.WriteLine(i+": "+command[i]);
-            }
-            // await clientSocket.SendAsync(Encoding.UTF8.GetBytes("+PONG\r\n"));
+            CommandHandler commandHandler = new CommandHandler(command);
+            String response = commandHandler.GetResponse();
+            await clientSocket.SendAsync(Encoding.UTF8.GetBytes(response));
         }
     }
 }
