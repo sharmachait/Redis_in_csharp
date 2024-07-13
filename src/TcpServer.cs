@@ -32,12 +32,12 @@ class TcpServer
             await clientSocket.ReceiveAsync(command);
 
             RespParser parser = new RespParser(command);
-            String[] _command = parser.GetCommand();
+            String[] command = parser.GetCommand();
             Console.WriteLine("Command: ");
 
-            for (int i = 0; i < _command.Length; i++)
+            for (int i = 0; i < command.Length; i++)
             {
-                Console.WriteLine(i+": "+_command[i]);
+                Console.WriteLine(i+": "+command[i]);
             }
             // await clientSocket.SendAsync(Encoding.UTF8.GetBytes("+PONG\r\n"));
         }

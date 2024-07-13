@@ -34,6 +34,8 @@ public class RespParser
     {
         String len = parts[0].Substring(0, parts[0].Length);
         int length = int.Parse(len);
+        Console.WriteLine("length: "+length);
+
         _command = new String[length];
         _command[0] = parts[2].ToLower();
         int idx = 1;
