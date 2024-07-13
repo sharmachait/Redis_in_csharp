@@ -12,7 +12,7 @@ public class CommandHandler
                 _response = "+PONG\r\n";
                 break;
             case "echo":
-                _response = $"+&{command[1]}\r\n";
+                _response = $"+{command[1]}\r\n";
                 break;
             default:
                 _response = "+No Response\r\n";
