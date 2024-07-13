@@ -21,6 +21,8 @@ public class RespParser
         String[] parts = _data.Split("\r\n");
         Console.WriteLine("parts[0]: ");
         Console.WriteLine(parts[0]);
+        Console.WriteLine("parts[0][0]: ");
+        Console.WriteLine(parts[0][0]);
         if (parts[0][0] == '*')
         {
             ParseArray(parts);
