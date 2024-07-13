@@ -32,8 +32,11 @@ class TcpServer
             await clientSocket.ReceiveAsync(command);
 
             string result = Encoding.UTF8.GetString(command);
-            Console.WriteLine("String got"+result.Substring(0,result.IndexOf('\n')));
-            Console.WriteLine("String end");
+            string[] lines = result.Split('\n');
+            foreach (string line in lines)
+            {
+                Console.Write(line+"\\r\\n");
+            }
 
             // await clientSocket.SendAsync(Encoding.UTF8.GetBytes("+PONG\r\n"));
         }
