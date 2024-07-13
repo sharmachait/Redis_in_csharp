@@ -34,7 +34,7 @@ class TcpServer
             string result = Encoding.UTF8.GetString(command);
             Console.WriteLine(result);
 
-            await clientSocket.SendAsync(Encoding.UTF8.GetBytes("+PONG\r\n"));
+            // await clientSocket.SendAsync(Encoding.UTF8.GetBytes("+PONG\r\n"));
         }
     }
 }
