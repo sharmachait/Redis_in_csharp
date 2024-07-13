@@ -21,13 +21,13 @@ public class RespParser
         String[] parts = _data.Split("\r\n");
         if (parts[0][0]=='*')
         {
-            Console.WriteLine("Parsing....");
             ParseArray(parts);
         }
     }
 
     public void ParseArray(String[] parts)
     {
+        Console.WriteLine("Parsing....");
         String len = parts[0].Substring(1, parts[0].Length);
         Console.WriteLine("len: "+len);
         int length = int.Parse(len);
