@@ -32,7 +32,6 @@ class TcpServer
             await clientSocket.ReceiveAsync(command);
 
             RespParser parser = new RespParser(command);
-            parser.MakeCommand();
             String[] _command = parser.GetCommand();
             Console.WriteLine("Command: ");
 

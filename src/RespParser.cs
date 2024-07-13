@@ -9,27 +9,18 @@ public class RespParser
     public RespParser(byte[] command)
     {
         _data = Encoding.UTF8.GetString(command);
+        MakeCommand();
     }
-
-    public String GetData()
-    {
-        return _data;
-    }
-
     public String[] GetCommand()
     {
         return _command;
     }
 
-    public String[] GetParts()
-    {
-        String[] parts = _data.Split("\r\n");
-        return parts;
-    }
-
     public void MakeCommand()
     {
-        String[] parts = GetParts();
+        String[] parts = _data.Split("\r\n");
+        Console.WriteLine("parts[0]: ");
+        Console.WriteLine(parts[0]);
         if (parts[0][0] == '*')
         {
             ParseArray(parts);
