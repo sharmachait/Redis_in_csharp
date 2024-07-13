@@ -27,12 +27,8 @@ public class RespParser
 
     public void ParseArray(String[] parts)
     {
-        Console.WriteLine("Parsing...."+parts[0].Substring(1));
         String len = parts[0].Substring(1);
-        Console.WriteLine("len: "+len);
         int length = int.Parse(len);
-        Console.WriteLine("length: "+length);
-
         _command = new String[length];
         _command[0] = parts[2].ToLower();
         int idx = 1;
