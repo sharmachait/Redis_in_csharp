@@ -24,11 +24,6 @@ public class RespParser
     public String[] GetParts()
     {
         String[] parts = _data.Split("\r\n");
-        Console.WriteLine("parts: ");
-        int c = 0;
-        foreach(String part in parts){
-            Console.WriteLine(c+": "+part);
-        }
         return parts;
     }
 
