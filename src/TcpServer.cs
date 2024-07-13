@@ -33,6 +33,7 @@ class TcpServer
 
             string result = Encoding.UTF8.GetString(command);
             string[] lines = result.Split('\n');
+            Console.WriteLine("String Received");
             foreach (string line in lines)
             {
                 Console.Write(line+"\\r\\n");
