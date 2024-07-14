@@ -9,7 +9,7 @@ public class Store
         map = new Dictionary<String, Value>();
     }
 
-    public Dictionary<String, String> GetMap()
+    public Dictionary<String, Value> GetMap()
     {
         return this.map;
     }

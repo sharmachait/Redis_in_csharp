@@ -6,8 +6,8 @@ public class CommandHandler
     public CommandHandler(String[] command, Store store)
     {
         String cmd = command[0];
-
-        switch(cmd){
+        DateTime currTime = DateTime.Now;
+        switch (cmd){
             case "ping":
                 _response = "+PONG\r\n";
                 break;
@@ -15,7 +15,7 @@ public class CommandHandler
                 _response = $"+{command[1]}\r\n";
                 break;
             case "get":
-                DateTime currTime = DateTime.Now;
+                
                 try
                 {
                     Value val = store.GetMap()[command[1]];
@@ -36,7 +36,7 @@ public class CommandHandler
                 }
                 break;
             case "set":
-                DateTime currTime = DateTime.Now;
+                
                 if (command.Length == 3)
                 {
                     
