@@ -16,6 +16,7 @@ public class CommandHandler
                 break;
             case "get":
                 Console.WriteLine("Current Time: " + currTime.ToString());
+                Console.WriteLine("Key: " + command[1]);
                 try
                 {
                     Value val = store.GetMap()[command[1]];
