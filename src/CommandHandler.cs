@@ -19,7 +19,7 @@ public class CommandHandler
                 try
                 {
                     Value val = store.GetMap()[command[1]];
-                    if(currTime >= val.expiry)
+                    if(currTime < val.expiry)
                     {
                         _response = $"+{val.val}\r\n";
                     }
