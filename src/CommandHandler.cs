@@ -15,36 +15,9 @@ public class CommandHandler
                 _response = $"+{command[1]}\r\n";
                 break;
             case "get":
-                Console.WriteLine("Current Time: " + currTime.ToString());
-                Console.WriteLine("Key: " + command[1]);
-                Console.WriteLine("Keys: ");
-                Dictionary<string, Value> g = store.GetMap();
-                
-                foreach (string key in g.Keys) 
-                {
-                    Console.WriteLine(key + ": " + g[key].val);
-                }
-
-
-
-
-
-
                 try
                 {
-                    Value val = store.GetMap()[command[1]];
-                    
-                    Console.WriteLine("Value: " + val.val);
-                    Console.WriteLine("Expiry: " + val.expiry.ToString());
-                    if (currTime <= val.expiry)
-                    {
-                        _response = $"+{val.val}\r\n";
-                    }
-                    else
-                    {
-                        store.GetMap().Remove(command[1]);
-                        _response = $"$-1\r\n";
-                    }
+                    Get(command, store);
                 }
                 catch (KeyNotFoundException)
                 {
@@ -52,7 +25,11 @@ public class CommandHandler
                 }
                 break;
             case "set":
-                
+
+                Console.WriteLine("Current Time: " + currTime.ToString());
+                Console.WriteLine("Key: " + command[1]);
+                Console.WriteLine("Keys: ");
+
                 if (command.Length == 3)
                 {
                     DateTime expiry = DateTime.MaxValue;
@@ -66,8 +43,14 @@ public class CommandHandler
                     DateTime expiry = currTime.AddMilliseconds(delta);
                     Value val = new Value(command[2], currTime, expiry);
                     store.GetMap()[command[1]] = val;
-                } 
-                
+                }
+                Dictionary<string, Value> g = store.GetMap();
+                foreach (string key in g.Keys)
+                {
+                    Console.WriteLine(key + ": " + g[key].val);
+                }
+
+
                 _response = "+OK\r\n";
                 break;
             default:
@@ -78,5 +61,21 @@ public class CommandHandler
     public String GetResponse()
     {
         return _response;
+    }
+    public void Get(String[] command,Store store)
+    {
+        Value val = store.GetMap()[command[1]];
+
+        Console.WriteLine("Value: " + val.val);
+        Console.WriteLine("Expiry: " + val.expiry.ToString());
+        if (currTime <= val.expiry)
+        {
+            _response = $"+{val.val}\r\n";
+        }
+        else
+        {
+            store.GetMap().Remove(command[1]);
+            _response = $"$-1\r\n";
+        }
     }
 }
