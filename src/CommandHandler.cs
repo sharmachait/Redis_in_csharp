@@ -25,38 +25,14 @@ public class CommandHandler
                 }
                 break;
             case "set":
-
-                Console.WriteLine("Current Time: " + currTime.ToString());
-                Console.WriteLine("Command Length: "+command.Length);
-
-                if (command.Length == 3)
+                try
                 {
-                    DateTime expiry = DateTime.MaxValue;
-                    Value val = new Value(command[2], currTime, expiry);
-                    store.GetMap()[command[1]] = val;
+                    Set(command, store, currTime);
                 }
-                else if (command.Length == 5 && command[3].Equals("px"))
+                catch (KeyNotFoundException)
                 {
-                    int delta = int.Parse(command[4]);
-                    
-                    DateTime expiry = currTime.AddMilliseconds(delta);
-                    Value val = new Value(command[2], currTime, expiry);
-                    store.GetMap()[command[1]] = val;
+                    _response = $"$-1\r\n";
                 }
-
-
-
-
-
-
-
-                Console.WriteLine("Keys: ");
-                Dictionary<string, Value> g = store.GetMap();
-                foreach (string key in g.Keys)
-                {
-                    Console.WriteLine(key + ": " + g[key].val);
-                }
-                _response = "+OK\r\n";
                 break;
             default:
                 _response = "+No Response\r\n";
@@ -64,16 +40,30 @@ public class CommandHandler
         }
     }
     
-    
-    
-    
     public String GetResponse()
     {
         return _response;
     }
 
 
+    public void Set(String[] command, Store store, DateTime currTime)
+    {
+        if (command.Length == 3)
+        {
+            DateTime expiry = DateTime.MaxValue;
+            Value val = new Value(command[2], currTime, expiry);
+            store.GetMap()[command[1]] = val;
+        }
+        else if (command.Length == 5 && command[3].Equals("px"))
+        {
+            int delta = int.Parse(command[4]);
 
+            DateTime expiry = currTime.AddMilliseconds(delta);
+            Value val = new Value(command[2], currTime, expiry);
+            store.GetMap()[command[1]] = val;
+        }
+        _response = "+OK\r\n";
+    }
 
     public void Get(String[] command,Store store,DateTime currTime)
     {
@@ -91,4 +81,5 @@ public class CommandHandler
             _response = $"$-1\r\n";
         }
     }
+
 }
