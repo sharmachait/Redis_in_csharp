@@ -34,6 +34,7 @@ class TcpServer
 
             RespParser parser = new RespParser(buffer);
             String[] command = parser.GetCommand();
+            Console.Write("Command Parsed: ");
             foreach (String cmd in command)
             {
                 Console.Write(cmd + " ");
