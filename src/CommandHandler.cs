@@ -17,7 +17,7 @@ public class CommandHandler
             case "get":
                 try
                 {
-                    Get(command, store);
+                    Get(command, store, currTime);
                 }
                 catch (KeyNotFoundException)
                 {
@@ -27,8 +27,7 @@ public class CommandHandler
             case "set":
 
                 Console.WriteLine("Current Time: " + currTime.ToString());
-                Console.WriteLine("Key: " + command[1]);
-                Console.WriteLine("Keys: ");
+                Console.WriteLine("Command Length: "+command.Length);
 
                 if (command.Length == 3)
                 {
@@ -36,7 +35,7 @@ public class CommandHandler
                     Value val = new Value(command[2], currTime, expiry);
                     store.GetMap()[command[1]] = val;
                 }
-                else if (command.Length == 5 && command[3].Equals("pc"))
+                else if (command.Length == 5 && command[3].Equals("px"))
                 {
                     int delta = int.Parse(command[4]);
                     
@@ -44,13 +43,19 @@ public class CommandHandler
                     Value val = new Value(command[2], currTime, expiry);
                     store.GetMap()[command[1]] = val;
                 }
+
+
+
+
+
+
+
+                Console.WriteLine("Keys: ");
                 Dictionary<string, Value> g = store.GetMap();
                 foreach (string key in g.Keys)
                 {
                     Console.WriteLine(key + ": " + g[key].val);
                 }
-
-
                 _response = "+OK\r\n";
                 break;
             default:
@@ -58,11 +63,19 @@ public class CommandHandler
                 break;
         }
     }
+    
+    
+    
+    
     public String GetResponse()
     {
         return _response;
     }
-    public void Get(String[] command,Store store)
+
+
+
+
+    public void Get(String[] command,Store store,DateTime currTime)
     {
         Value val = store.GetMap()[command[1]];
 
