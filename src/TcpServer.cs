@@ -6,9 +6,10 @@ using System.Text;
 class TcpServer
 {
     private readonly TcpListener _server;
-
+    private readonly Store _store;
     public TcpServer(IPAddress ipAddress, int port)
     {
+        _store = new Store();
         _server = new TcpListener(ipAddress, port);
     }
 
@@ -34,9 +35,11 @@ class TcpServer
             RespParser parser = new RespParser(buffer);
             String[] command = parser.GetCommand();
 
-            CommandHandler commandHandler = new CommandHandler(command);
+            CommandHandler commandHandler = new CommandHandler(command,_store);
             String response = commandHandler.GetResponse();
             await clientSocket.SendAsync(Encoding.UTF8.GetBytes(response));
         }
     }
 }
+
+
