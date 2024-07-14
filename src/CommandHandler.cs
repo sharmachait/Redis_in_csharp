@@ -15,11 +15,11 @@ public class CommandHandler
                 _response = $"+{command[1]}\r\n";
                 break;
             case "get":
-                
+                Console.WriteLine("Current Time: " + currTime.ToString());
                 try
                 {
                     Value val = store.GetMap()[command[1]];
-                    Console.WriteLine("Current Time: " + currTime.ToString());
+                    
                     Console.WriteLine("Value: " + val.val);
                     Console.WriteLine("Expiry: " + val.expiry.ToString());
                     if (currTime <= val.expiry)
@@ -41,7 +41,6 @@ public class CommandHandler
                 
                 if (command.Length == 3)
                 {
-                    
                     DateTime expiry = DateTime.MaxValue;
                     Value val = new Value(command[2], currTime, expiry);
                     store.GetMap()[command[1]] = val;
