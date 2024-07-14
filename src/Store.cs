@@ -2,11 +2,11 @@
 
 public class Store
 {
-    private Dictionary<String, String> map;
+    private Dictionary<String, Value> map;
 
     public Store()
     {
-        map = new Dictionary<string, string>();
+        map = new Dictionary<String, Value>();
     }
 
     public Dictionary<String, String> GetMap()
@@ -19,7 +19,7 @@ public class Value {
     public String val;
     public DateTime created;
     public DateTime expiry;
-    public Value(string val, DateTime created, DateTime expiry)
+    public Value(String val, DateTime created, DateTime expiry)
     {
         this.val = val;
         this.created = created;
