@@ -19,7 +19,10 @@ public class CommandHandler
                 try
                 {
                     Value val = store.GetMap()[command[1]];
-                    if(currTime < val.expiry)
+                    Console.WriteLine("Current Time: " + currTime.ToString());
+                    Console.WriteLine("Value: " + val.val);
+                    Console.WriteLine("Expiry: " + val.expiry.ToString());
+                    if (currTime <= val.expiry)
                     {
                         _response = $"+{val.val}\r\n";
                     }
