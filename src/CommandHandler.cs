@@ -31,8 +31,7 @@ public class CommandHandler
                 }
                 catch (KeyNotFoundException)
                 {
-                    
-                    _response = "error getting value";
+                    _response = $"$-1\r\n";
                 }
                 break;
             case "set":
