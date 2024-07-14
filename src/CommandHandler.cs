@@ -17,6 +17,19 @@ public class CommandHandler
             case "get":
                 Console.WriteLine("Current Time: " + currTime.ToString());
                 Console.WriteLine("Key: " + command[1]);
+                Console.WriteLine("Keys: ");
+                Dictionary<string, Value> g = store.GetMap();
+                
+                foreach (string key in g.Keys) 
+                {
+                    Console.WriteLine(key + ": " + g[key].val);
+                }
+
+
+
+
+
+
                 try
                 {
                     Value val = store.GetMap()[command[1]];

@@ -34,11 +34,12 @@ class TcpServer
 
             RespParser parser = new RespParser(buffer);
             String[] command = parser.GetCommand();
-            Console.Write("Command Parsed: ");
+            Console.WriteLine("Command Parsed: ");
             foreach (String cmd in command)
             {
                 Console.Write(cmd + " ");
             }
+            Console.WriteLine("Steps: ");
 
             CommandHandler commandHandler = new CommandHandler(command,_store);
             String response = commandHandler.GetResponse();
