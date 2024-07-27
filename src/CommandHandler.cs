@@ -111,5 +111,6 @@ public class CommandHandler
     {
         string replication = "# Replication\nrole:master";
         _response = _parser.MakeBulkString(replication);
+        Console.WriteLine(_response);
     }
 }
