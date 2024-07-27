@@ -103,7 +103,7 @@ public class CommandHandler
                 }
                 break;
             default:
-                _response = "Invalid options"
+                _response = "Invalid options";
                 break;
         }
     }
