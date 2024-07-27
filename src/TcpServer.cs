@@ -13,7 +13,7 @@ class TcpServer
         _server = new TcpListener(ipAddress, port);
     }
 
-    public async Task StartAsync()
+    public async Task StartAsync(string[] args)
     {
         _server.Start();
         Console.WriteLine("Server started...");

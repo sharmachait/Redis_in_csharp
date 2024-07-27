@@ -8,7 +8,7 @@ class Program
     {
         
         TcpServer server = new TcpServer(IPAddress.Any, 6379);
-        await server.StartAsync();
+        await server.StartAsync(args);
     }
 }
 
