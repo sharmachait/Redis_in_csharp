@@ -16,7 +16,7 @@ class TcpServer
     public async Task StartAsync(string[] args)
     {
         _server.Start();
-        Console.WriteLine("Server started...");
+        Console.WriteLine("Server started..."+args.Length);
 
         if (args.Length > 2) {// --port port_number info replication
             Console.WriteLine(args[3]);
