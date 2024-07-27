@@ -3,8 +3,10 @@
 public class CommandHandler
 {
     private String _response;
-    public CommandHandler(String[] command, Store store)
+    private RespParser _parser;
+    public CommandHandler(String[] command, Store store, RespParser parser)
     {
+        parser = parser;
         String cmd = command[0];
         DateTime currTime = DateTime.Now;
         switch (cmd){
@@ -33,6 +35,9 @@ public class CommandHandler
                 {
                     _response = $"$-1\r\n";
                 }
+                break;
+            case "info":
+                Info(command);
                 break;
             default:
                 _response = "+No Response\r\n";
@@ -82,4 +87,29 @@ public class CommandHandler
         }
     }
 
+
+    public void Info(string[] command)
+    {
+        switch (command[1])
+        {
+            case "replication":
+                try
+                {
+                    Replication();
+                }
+                catch (Exception e)
+                {
+                    _response = e.Message;
+                }
+                break;
+            default:
+                _response = "Invalid options"
+                break;
+        }
+    }
+    public void Replication()
+    {
+        string replication = "# Replication\nrole:master";
+        _response = _parser.MakeBulkString(replication);
+    }
 }

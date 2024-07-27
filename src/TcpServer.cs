@@ -7,6 +7,7 @@ class TcpServer
 {
     private readonly TcpListener _server;
     private readonly Store _store;
+
     public TcpServer(IPAddress ipAddress, int port)
     {
         _store = new Store();
@@ -17,12 +18,6 @@ class TcpServer
     {
         _server.Start();
         Console.WriteLine("Server started..."+args.Length);
-
-        if (args.Length > 2) {// --port port_number info replication
-            Console.WriteLine(args[3]);
-            RespParser parser = new RespParser();
-            Console.WriteLine(parser.MakeBulkString(args[4]));
-        }
 
         while (true)
         {
@@ -45,9 +40,9 @@ class TcpServer
             {
                 Console.Write(cmd + " ");
             }
-            Console.WriteLine("Steps: ");
+            Console.WriteLine();
 
-            CommandHandler commandHandler = new CommandHandler(command,_store);
+            CommandHandler commandHandler = new CommandHandler(command,_store,parser);
             String response = commandHandler.GetResponse();
             await clientSocket.SendAsync(Encoding.UTF8.GetBytes(response));
         }
