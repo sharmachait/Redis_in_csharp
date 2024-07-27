@@ -109,7 +109,7 @@ public class CommandHandler
     }
     public void Replication()
     {
-        string replication = "# Replication\nrole:master";
+        string replication = "role:master";
         _response = _parser.MakeBulkString(replication);
         Console.WriteLine(_response);
     }
