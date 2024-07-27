@@ -6,7 +6,7 @@ public class CommandHandler
     private RespParser _parser;
     public CommandHandler(String[] command, Store store, RespParser parser)
     {
-        parser = parser;
+        _parser = parser;
         String cmd = command[0];
         DateTime currTime = DateTime.Now;
         switch (cmd){
