@@ -41,7 +41,7 @@ public class RespParser
         }
     }
     public string MakeBulkString(string response) {
-        return @"$" + response.Length + @"\r\n" + response + @"\r\n";
+        return @"$" + response.Length + "\r\n" + response + "\r\n";
     }
 }
 
