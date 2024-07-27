@@ -6,6 +6,9 @@ public class RespParser
 {
     private String _data;
     private String[] _command;
+    public RespParser() {
+        
+    }
     public RespParser(byte[] command)
     {
         _data = Encoding.UTF8.GetString(command);
@@ -36,6 +39,9 @@ public class RespParser
         {
             _command[idx++] = parts[i];
         }
+    }
+    public string MakeBulkString(string response) {
+        return @"$" + response.Length + @"\r\n" + response + @"\r\n";
     }
 }
 

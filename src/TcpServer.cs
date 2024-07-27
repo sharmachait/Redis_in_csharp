@@ -18,6 +18,11 @@ class TcpServer
         _server.Start();
         Console.WriteLine("Server started...");
 
+        if (args.Length > 2) {// --port port_number info replication
+            Console.WriteLine(args[3]);
+            RespParser parser = new RespParser();
+            Console.WriteLine(parser.MakeBulkString(args[4]));
+        }
 
         while (true)
         {
