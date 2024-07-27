@@ -17,6 +17,7 @@ class TcpServer
     {
         _server.Start();
         Console.WriteLine("Server started...");
+        Console.WriteLine(args.Length);
 
         while (true)
         {
