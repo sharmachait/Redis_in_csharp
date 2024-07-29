@@ -8,7 +8,7 @@ class TcpServer
     private readonly TcpListener _server;
     private readonly Store _store;
 
-    public TcpServer(IPAddress ipAddress, int port, string role, string args[])
+    public TcpServer(IPAddress ipAddress, int port, string role, string[] args)
     {
         _store = new Store();
         _store.role = role;
