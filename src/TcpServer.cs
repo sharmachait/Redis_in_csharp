@@ -8,9 +8,15 @@ class TcpServer
     private readonly TcpListener _server;
     private readonly Store _store;
 
-    public TcpServer(IPAddress ipAddress, int port)
+    public TcpServer(IPAddress ipAddress, int port, string role, string args[])
     {
         _store = new Store();
+        _store.role = role;
+        if (role.Equals("slave"))
+        {
+            _store.MasterHost = args[3].Split(' ')[0];
+            _store.MasterPort = args[3].Split(' ')[1];
+        }
         _server = new TcpListener(ipAddress, port);
     }
 
