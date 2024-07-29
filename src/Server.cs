@@ -10,18 +10,18 @@ class Program
         {
             if (args.Length > 2 && args[2].Equals("--replicaof")) 
             {
-                TcpServer server = new TcpServer(IPAddress.Any, int.Parse(args[1]),"slave",args);
+                TcpServer server = new TcpServer(IPAddress.Any, int.Parse(args[1]), "slave",args);
                 await server.StartAsync(args);
             }
             else
             {
-                TcpServer server = new TcpServer(IPAddress.Any, int.Parse(args[1]),"master",args);
+                TcpServer server = new TcpServer(IPAddress.Any, int.Parse(args[1]), "master",args);
                 await server.StartAsync(args);
             }
         }
         else 
         {
-            TcpServer server = new TcpServer(IPAddress.Any, 6379);
+            TcpServer server = new TcpServer(IPAddress.Any, 6379, "master", args);
             await server.StartAsync(args);
         }
     }
