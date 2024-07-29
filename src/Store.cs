@@ -3,7 +3,7 @@
 public class Store
 {
     private Dictionary<String, Value> map;
-    public string role;
+    public string role="";
     public string MasterHost=".";
     public string MasterPort=".";
     public Store()
