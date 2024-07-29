@@ -47,6 +47,8 @@ class TcpServer
                 Console.Write(cmd + " ");
             }
             Console.WriteLine();
+            Console.WriteLine(_store.MasterHost);
+            Console.WriteLine(_store.MasterPort);
 
             CommandHandler commandHandler = new CommandHandler(command,_store,parser);
             String response = commandHandler.GetResponse();
