@@ -6,8 +6,8 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        int portFlag = args.IndexOf("--port");
-        int replicaFlag = args.IndexOf("--replicaof");
+        int portFlag = args.ToList().IndexOf("--port");
+        int replicaFlag = args.ToList().IndexOf("--replicaof");
         if (portFlag > -1) 
         {
             int port = int.Parse(args[portFlag + 1]);
