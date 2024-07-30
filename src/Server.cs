@@ -6,16 +6,20 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        if (args.Length > 0 && args[0].Equals("--port")) 
+        int portFlag = args.IndexOf("--port");
+        int replicaFlag = args.IndexOf("--replicaof");
+        if (portFlag > -1) 
         {
-            if (args.Length > 2 && args[2].Equals("--replicaof")) 
+            int port = int.Parse(args[portFlag + 1]);
+            if (replicaFlag > -1) 
             {
-                TcpServer server = new TcpServer(IPAddress.Any, int.Parse(args[1]), "slave",args);
+                
+                TcpServer server = new TcpServer(IPAddress.Any, port, "slave", args);
                 await server.StartAsync(args);
             }
             else
             {
-                TcpServer server = new TcpServer(IPAddress.Any, int.Parse(args[1]), "master",args);
+                TcpServer server = new TcpServer(IPAddress.Any, port, "master", args);
                 await server.StartAsync(args);
             }
         }
