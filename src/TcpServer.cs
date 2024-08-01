@@ -8,7 +8,7 @@ class TcpServer
     private readonly TcpListener _server;
     private readonly Store _store;
 
-    public TcpServer(IPAddress ipAddress, int port, string role, string[] args)
+    public TcpServer(Config config)
     {
         _store = new Store();
         _store.role = role;
@@ -17,7 +17,7 @@ class TcpServer
             _store.MasterHost = args[3].Split(' ')[0];
             _store.MasterPort = args[3].Split(' ')[1];
         }
-        _server = new TcpListener(ipAddress, port);
+        _server = new TcpListener(IPAddress.Any, port);
     }
 
     public async Task StartAsync(string[] args)
