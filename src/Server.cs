@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+
 namespace codecrafters_redis;
 
 class Program
@@ -6,7 +8,7 @@ class Program
     {
         int portFlag = args.ToList().IndexOf("--port");
         int replicaFlag = args.ToList().IndexOf("--replicaof");
-
+        ServiceCollection serviceProvider = new ServiceCollection();
 
         TcpServer server;
 
