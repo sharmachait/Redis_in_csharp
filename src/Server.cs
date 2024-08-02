@@ -7,7 +7,10 @@ class Program
         int portFlag = args.ToList().IndexOf("--port");
         int replicaFlag = args.ToList().IndexOf("--replicaof");
 
-        
+
+        TcpServer server;
+
+
         if (portFlag > -1) 
         {
             int port = int.Parse(args[portFlag + 1]);
@@ -19,24 +22,22 @@ class Program
 
                 RedisConfig config = new RedisConfig("slave", port, masterPort, masterHost);
 
-                TcpServer server = new TcpServer(config);
-                await server.StartAsync(args);
+                server = new TcpServer(config);
             }
             else
             {
                 RedisConfig config = new RedisConfig(port);
 
-                TcpServer server = new TcpServer(config);
-                await server.StartAsync(args);
+                server = new TcpServer(config);
             }
         }
         else 
         {
             RedisConfig config = new RedisConfig();
 
-            TcpServer server = new TcpServer(config);
-            await server.StartAsync(args);
+            server = new TcpServer(config);
         }
+        await server.StartAsync();
     }
 }
 
