@@ -14,18 +14,17 @@ class Program
 
             if (replicaFlag > -1) 
             {
-                string MasterHost = args[3].Split(' ')[0];
-                int MasterPort = args[3].Split(' ')[1];
+                string masterHost = args[replicaFlag + 1].Split(' ')[0];
+                int masterPort = int.Parse(args[replicaFlag + 1].Split(' ')[1]);
 
-
-                Config config new Config(config);
+                RedisConfig config = new RedisConfig("slave", port, masterPort, masterHost);
 
                 TcpServer server = new TcpServer(config);
                 await server.StartAsync(args);
             }
             else
             {
-                Config config new Config(port);
+                RedisConfig config = new RedisConfig(port);
 
                 TcpServer server = new TcpServer(config);
                 await server.StartAsync(args);
@@ -33,8 +32,7 @@ class Program
         }
         else 
         {
-
-            Config config new Config();
+            RedisConfig config = new RedisConfig();
 
             TcpServer server = new TcpServer(config);
             await server.StartAsync(args);
@@ -42,26 +40,3 @@ class Program
     }
 }
 
-/*public Config(string role, int port, int masterPort, string masterHost)
-{
-    this.role = role;
-    this.port = port;
-    this.masterHost = masterHost;
-    this.masterPort = masterPort;
-}
-
-public Config(int port)
-{
-    this.role = "master";
-    this.port = port;
-    this.masterHost = ".";
-    this.masterPort = int.MinValue;
-}
-
-public Config()
-{
-    this.role = "slave";
-    this.port = port;
-    this.masterHost = "NA";
-    this.masterPort = 6379;
-}*/

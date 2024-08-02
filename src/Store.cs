@@ -2,16 +2,16 @@
 
 public class Store
 {
-    private Dictionary<String, Value> map;
-    public string role="";
-    public string MasterHost=".";
-    public string MasterPort=".";
+    private Dictionary<string, Value> map;
+    public string role = "";
+    public string MasterHost = ".";
+    public int MasterPort = 6379;
     public Store()
     {
-        map = new Dictionary<String, Value>();
+        map = new Dictionary<string, Value>();
     }
 
-    public Dictionary<String, Value> GetMap()
+    public Dictionary<string, Value> GetMap()
     {
         return this.map;
     }
@@ -54,10 +54,10 @@ public class Store
 }
 
 public class Value {
-    public String val;
+    public string val;
     public DateTime created;
     public DateTime expiry;
-    public Value(String val, DateTime created, DateTime expiry)
+    public Value(string val, DateTime created, DateTime expiry)
     {
         this.val = val;
         this.created = created;

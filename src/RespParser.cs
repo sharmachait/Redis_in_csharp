@@ -4,8 +4,8 @@ namespace codecrafters_redis;
 
 public class RespParser
 {
-    private String _data;
-    private String[] _command;
+    private string _data;
+    private string[] _command;
     public RespParser() {
         
     }
@@ -14,25 +14,25 @@ public class RespParser
         _data = Encoding.UTF8.GetString(command);
         MakeCommand();
     }
-    public String[] GetCommand()
+    public string[] GetCommand()
     {
         return _command;
     }
 
     public void MakeCommand()
     {
-        String[] parts = _data.Split("\r\n");
+        string[] parts = _data.Split("\r\n");
         if (parts[0][0]=='*')
         {
             ParseArray(parts);
         }
     }
 
-    public void ParseArray(String[] parts)
+    public void ParseArray(string[] parts)
     {
-        String len = parts[0].Substring(1);
+        string len = parts[0].Substring(1);
         int length = int.Parse(len);
-        _command = new String[length];
+        _command = new string[length];
         _command[0] = parts[2].ToLower();
         int idx = 1;
         for (int i = 4; i < parts.Length; i+=2)
@@ -44,5 +44,6 @@ public class RespParser
         return @"$" + response.Length + "\r\n" + response + "\r\n";
     }
 }
+
 
 

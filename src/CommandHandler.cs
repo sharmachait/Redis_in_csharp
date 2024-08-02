@@ -2,14 +2,14 @@
 
 public class CommandHandler
 {
-    private String _response;
+    private string _response;
     private RespParser _parser;
     Store _store;
-    public CommandHandler(String[] command, Store store, RespParser parser)
+    public CommandHandler(string[] command, Store store, RespParser parser)
     {
         _parser = parser;
         _store = store;
-        String cmd = command[0];
+        string cmd = command[0];
         DateTime currTime = DateTime.Now;
         switch (cmd){
             case "ping":
@@ -47,13 +47,13 @@ public class CommandHandler
         }
     }
     
-    public String GetResponse()
+    public string GetResponse()
     {
         return _response;
     }
 
 
-    public void Set(String[] command, DateTime currTime)
+    public void Set(string[] command, DateTime currTime)
     {
         if (command.Length == 3)
         {
@@ -72,7 +72,7 @@ public class CommandHandler
         _response = "+OK\r\n";
     }
 
-    public void Get(String[] command,DateTime currTime)
+    public void Get(string[] command,DateTime currTime)
     {
         Value val = _store.GetMap()[command[1]];
 
