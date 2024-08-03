@@ -59,10 +59,20 @@ public class CommandHandler
     }
     public string Replication()
     {
-        string replication = "role:" + _config.role+"\r\n" +
-            "master_replid:" + _config.masterReplId+"\r\n" +
-            "master_repl_offset:" + _config.masterReplOffset;
-        Console.WriteLine(replication);
-        return _parser.MakeBulkString(replication);
+        string role = $"role:{_config.role}";
+        string masterReplid = $"master_replid:{_config.masterReplId}";
+        string masterReplOffset = $"master_repl_offset:{_config.masterReplOffset}";
+
+        string[] info = [role, masterReplid, masterReplOffset];
+
+        string replicationData = string.Join("\r\n", info);
+        
+            //"role:" + _config.role+"\r\n" +
+            //"master_replid:" + _config.masterReplId+"\r\n" +
+            //"master_repl_offset:" + _config.masterReplOffset;
+
+
+        Console.WriteLine(replicationData);
+        return _parser.MakeBulkString(replicationData);
     }
 }
