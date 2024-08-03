@@ -28,6 +28,7 @@ class Program
                     NetworkStream stream = client.GetStream();
                     string ping = "*1\r\n$4\r\nPING\r\n";
                     stream.Write(Encoding.UTF8.GetBytes(ping));
+                    stream.Flush();
                 }
             }
             else
