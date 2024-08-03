@@ -38,6 +38,7 @@ public class RespParser
     }
     public string RespArray(string[] a) {
         var s= "*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n";
+        Console.WriteLine("dkhghdkfjhgd " + s);
         List<string> res = new List<string>();
 
         int len = a.Length;
@@ -48,8 +49,6 @@ public class RespParser
             res.Add("$" + e.Length);
             res.Add(e);
         }
-
-        
 
         return string.Join("\r\n",res)+"\r\n";
     }
