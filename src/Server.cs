@@ -1,4 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.Sockets;
+using System.Text;
 
 namespace codecrafters_redis;
 
@@ -21,6 +23,12 @@ class Program
                 int masterPort = int.Parse(args[replicaFlag + 1].Split(' ')[1]);
 
                 config = new RedisConfig("slave", port, masterPort, masterHost);
+                using (TcpClient client = new TcpClient(masterHost, masterPort))
+                {
+                    NetworkStream stream = client.GetStream();
+                    string ping = "*1\r\n$4\r\nPING\r\n";
+                    stream.Write(Encoding.UTF8.GetBytes(ping));
+                }
             }
             else
             {

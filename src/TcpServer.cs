@@ -6,8 +6,6 @@ using System.Text;
 class TcpServer
 {
     private readonly TcpListener _server;
-
-
     private readonly RespParser _parser ;
     private readonly CommandHandler _handler;
 
