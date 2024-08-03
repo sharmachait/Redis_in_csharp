@@ -56,7 +56,8 @@ class Program
 
             string ping = "*1\r\n$4\r\nPING\r\n";
             string[] pingArr = ["PING"];
-            stream.Write(Encoding.UTF8.GetBytes(parser.RespArray(pingArr)));
+            Console.WriteLine(parser.RespArray(pingArr)); 
+            stream.Write(Encoding.UTF8.GetBytes(ping));
             //StreamReader reader = new StreamReader(stream,Encoding.UTF8);
             //Console.WriteLine("Response from master: " + reader.ReadToEnd());//+PONG
 
