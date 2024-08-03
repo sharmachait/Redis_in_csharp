@@ -2,117 +2,65 @@
 
 public class CommandHandler
 {
-    private string _response;
-    private RespParser _parser;
-    Store _store;
-    public CommandHandler(string[] command, Store store, RespParser parser)
+    private readonly RespParser _parser;
+    private readonly Store _store;
+    private readonly RedisConfig _config;
+
+    public CommandHandler(Store store, RespParser parser, RedisConfig config)
     {
         _parser = parser;
         _store = store;
+        _config = config;
+    }
+
+    public string Handle(string[] command) {
         string cmd = command[0];
         DateTime currTime = DateTime.Now;
-        switch (cmd){
+        switch (cmd)
+        {
             case "ping":
-                _response = "+PONG\r\n";
-                break;
+                return "+PONG\r\n";
+                
             case "echo":
-                _response = $"+{command[1]}\r\n";
-                break;
+                return $"+{command[1]}\r\n";
+                
             case "get":
-                try
-                {
-                    Get(command, currTime);
-                }
-                catch (KeyNotFoundException)
-                {
-                    _response = $"$-1\r\n";
-                }
-                break;
+                return _store.Get(command, currTime);
+                
             case "set":
-                try
-                {
-                    Set(command, currTime);
-                }
-                catch (KeyNotFoundException)
-                {
-                    _response = $"$-1\r\n";
-                }
-                break;
+                return _store.Set(command, currTime);
+                
             case "info":
-                Info(command);
-                break;
+                return Info(command);
+                
             default:
-                _response = "+No Response\r\n";
-                break;
+                return "+No Response\r\n";
+                
         }
     }
     
-    public string GetResponse()
-    {
-        return _response;
-    }
-
-
-    public void Set(string[] command, DateTime currTime)
-    {
-        if (command.Length == 3)
-        {
-            DateTime expiry = DateTime.MaxValue;
-            Value val = new Value(command[2], currTime, expiry);
-            _store.GetMap()[command[1]] = val;
-        }
-        else if (command.Length == 5 && command[3].Equals("px"))
-        {
-            int delta = int.Parse(command[4]);
-
-            DateTime expiry = currTime.AddMilliseconds(delta);
-            Value val = new Value(command[2], currTime, expiry);
-            _store.GetMap()[command[1]] = val;
-        }
-        _response = "+OK\r\n";
-    }
-
-    public void Get(string[] command,DateTime currTime)
-    {
-        Value val = _store.GetMap()[command[1]];
-
-        Console.WriteLine("Value: " + val.val);
-        Console.WriteLine("Expiry: " + val.expiry.ToString());
-        if (currTime <= val.expiry)
-        {
-            _response = $"+{val.val}\r\n";
-        }
-        else
-        {
-            _store.GetMap().Remove(command[1]);
-            _response = $"$-1\r\n";
-        }
-    }
-
-
-    public void Info(string[] command)
+    public string Info(string[] command)
     {
         switch (command[1])
         {
             case "replication":
                 try
                 {
-                    Replication();
+                    return Replication();
                 }
                 catch (Exception e)
                 {
-                    _response = e.Message;
+                    return e.Message;
                 }
-                break;
             default:
-                _response = "Invalid options";
-                break;
+                return "Invalid options";
+                
         }
     }
-    public void Replication()
+    public string Replication()
     {
-        string replication = "role:"+_store.role;
-        _response = _parser.MakeBulkString(replication);
-        Console.WriteLine(_response);
+        string replication = "role:"+_config.role;
+        Console.WriteLine(replication);
+        return _parser.MakeBulkString(replication);
     }
 }
