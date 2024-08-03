@@ -49,7 +49,7 @@ public class RespParser
             res.Add(e);
         }
 
-        Console.WriteLine("generated strinmg: "+string.Join("\r\n", res) + "\r\n");
+        
 
         return string.Join("\r\n",res)+"\r\n";
     }
