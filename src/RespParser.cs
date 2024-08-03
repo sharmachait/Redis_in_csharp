@@ -49,7 +49,7 @@ public class RespParser
             res.Add(e);
         }
 
-        return string.Join("\r\n",res);
+        return string.Join("\r\n",res)+"\r\n";
     }
 }
 
