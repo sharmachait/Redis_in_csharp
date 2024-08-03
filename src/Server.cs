@@ -48,27 +48,30 @@ class Program
     }
 
     static RedisConfig InitiateSlavery(int port, string masterHost,int masterPort) { 
+        RespParser parser=new RespParser();
         RedisConfig config = new RedisConfig("slave", port, masterPort, masterHost);
         using (TcpClient client = new TcpClient(masterHost, masterPort))
         {
             NetworkStream stream = client.GetStream();
 
-            string ping = "*1\r\n$4\r\nPING\r\n";
-            stream.Write(Encoding.UTF8.GetBytes(ping));
+            string[] ping =["PING"];
+            stream.Write(Encoding.UTF8.GetBytes(parser.RespArray(ping)));
             //StreamReader reader = new StreamReader(stream,Encoding.UTF8);
             //Console.WriteLine("Response from master: " + reader.ReadToEnd());//+PONG
 
-            string ReplconfPort = $"*3\r\n$8\r\nREPLCONF\r\n$14\r\nlistening-port\r\n$4\r\n{config.port}\r\n";
-            stream.Write(Encoding.UTF8.GetBytes(ReplconfPort));
+            string[] ReplconfPort = ["REPLCONF", "listening-port", config.port.ToString()];
+
+            stream.Write(Encoding.UTF8.GetBytes(parser.RespArray(ReplconfPort)));
             //StreamReader reader = new StreamReader(stream, Encoding.UTF8);
             //Console.WriteLine("Response from master: " + reader.ReadToEnd());//+OK
 
-            string ReplconfCapa = "*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n";
-            stream.Write(Encoding.UTF8.GetBytes(ReplconfCapa));
+            string[] ReplconfCapa = ["REPLCONF", "capa", "psync2"];
+            stream.Write(Encoding.UTF8.GetBytes(parser.RespArray(ReplconfCapa)));
             //StreamReader reader = new StreamReader(stream, Encoding.UTF8);
             //Console.WriteLine("Response from master: " + reader.ReadToEnd());//+OK
         }
         return config;
+
     }
 }
 

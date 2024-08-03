@@ -73,6 +73,6 @@ public class CommandHandler
             //"master_repl_offset:" + _config.masterReplOffset;
 
         Console.WriteLine(replicationData);
-        return _parser.MakeBulkString(replicationData);
+        return _parser.RespBulkString(replicationData);
     }
 }

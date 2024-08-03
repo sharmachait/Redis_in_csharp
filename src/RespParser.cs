@@ -33,8 +33,23 @@ public class RespParser
         return _command;
     }
 
-    public string MakeBulkString(string response) {
-        return @"$" + response.Length + "\r\n" + response + "\r\n";
+    public string RespBulkString(string response) {
+        return "$" + response.Length + "\r\n" + response + "\r\n";
+    }
+    public string RespArray(string[] a) {
+        var s= "*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n";
+        List<string> res = new List<string>();
+
+        int len = a.Length;
+
+        res.Add("*" + len);
+
+        foreach (string e in a) {
+            res.Add("$" + e.Length);
+            res.Add(e);
+        }
+
+        return string.Join("\r\n",res);
     }
 }
 
