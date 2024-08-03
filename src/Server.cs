@@ -26,11 +26,17 @@ class Program
                 using (TcpClient client = new TcpClient(masterHost, masterPort))
                 {
                     NetworkStream stream = client.GetStream();
+
                     string ping = "*1\r\n$4\r\nPING\r\n";
                     stream.Write(Encoding.UTF8.GetBytes(ping));
+                    //StreamReader reader = new StreamReader(stream,Encoding.UTF8);
+                    //Console.WriteLine("Response from master: " + reader.ReadToEnd());//+PONG
+
                     string ReplconfPort = $"*3\r\n$8\r\nREPLCONF\r\n$14\r\nlistening-port\r\n$4\r\n{config.port}\r\n";
-                    StreamReader reader = new StreamReader(stream,Encoding.UTF8);
+                    stream.Write(Encoding.UTF8.GetBytes(ping));
+                    StreamReader reader = new StreamReader(stream, Encoding.UTF8);
                     Console.WriteLine("Response from master: " + reader.ReadToEnd());
+
                 }
             }
             else
