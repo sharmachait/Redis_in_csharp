@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace codecrafters_redis;
+﻿namespace codecrafters_redis;
 public class RedisConfig
 {
     public string role; 
     public int port;
     public int masterPort;
     public string masterHost;
+    public string masterReplId;
+    public long masterReplOffset;
 
     public RedisConfig(string role, int port, int masterPort, string masterHost)
     {
@@ -18,6 +14,8 @@ public class RedisConfig
         this.port = port;
         this.masterHost = masterHost;
         this.masterPort = masterPort;
+        masterReplId = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N").Substring(0, 8);
+        masterReplOffset = 0;
     }
 
     public RedisConfig(int port)
@@ -26,6 +24,8 @@ public class RedisConfig
         this.port = port;
         this.masterHost = ".";
         this.masterPort = int.MinValue;
+        masterReplId = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N").Substring(0, 8);
+        masterReplOffset = 0;
     }
 
     public RedisConfig()
@@ -34,6 +34,8 @@ public class RedisConfig
         this.port = 6379;
         this.masterHost = ".";
         this.masterPort = int.MinValue;
+        masterReplId = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N").Substring(0, 8);
+        masterReplOffset = 0;
     }
 
 }

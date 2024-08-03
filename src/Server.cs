@@ -31,7 +31,7 @@ class Program
         {
             config = new RedisConfig();
         }
-
+        
 
         var serviceProvider = new ServiceCollection()
             .AddSingleton(config)
