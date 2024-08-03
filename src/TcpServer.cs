@@ -6,17 +6,17 @@ using System.Text;
 class TcpServer
 {
     private readonly TcpListener _server;
-    private readonly Store _store;
 
-    public TcpServer(RedisConfig config)
+
+    private readonly RespParser _parser ;
+    private readonly CommandHandler _handler;
+
+    public TcpServer(RedisConfig config, Store store, RespParser parser, CommandHandler handler)
     {
-        _store = new Store();
-        _store.role = config.role;
-        if (config.role.Equals("slave"))
-        {
-            _store.MasterHost = config.masterHost;
-            _store.MasterPort = config.masterPort;
-        }
+        _handler = handler;
+
+        _parser = parser;
+
         _server = new TcpListener(IPAddress.Any, config.port);
     }
 
@@ -39,19 +39,16 @@ class TcpServer
             byte[] buffer = new byte[clientSocket.ReceiveBufferSize];
             await clientSocket.ReceiveAsync(buffer);
 
-            RespParser parser = new RespParser(buffer);
-            string[] command = parser.GetCommand();
+            
+            string[] command = _parser.MakeCommand(buffer);
+             
             Console.WriteLine("Command Parsed: ");
             foreach (string cmd in command)
             {
                 Console.Write(cmd + " ");
             }
-            Console.WriteLine();
-            Console.WriteLine(_store.MasterHost);
-            Console.WriteLine(_store.MasterPort);
-
-            CommandHandler commandHandler = new CommandHandler(command,_store,parser);
-            string response = commandHandler.GetResponse();
+            
+            string response = _handler.Handle(command);
             await clientSocket.SendAsync(Encoding.UTF8.GetBytes(response));
         }
     }

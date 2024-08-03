@@ -8,10 +8,8 @@ class Program
     {
         int portFlag = args.ToList().IndexOf("--port");
         int replicaFlag = args.ToList().IndexOf("--replicaof");
-        ServiceCollection serviceProvider = new ServiceCollection();
-
-        TcpServer server;
-
+        
+        RedisConfig config;
 
         if (portFlag > -1) 
         {
@@ -22,24 +20,29 @@ class Program
                 string masterHost = args[replicaFlag + 1].Split(' ')[0];
                 int masterPort = int.Parse(args[replicaFlag + 1].Split(' ')[1]);
 
-                RedisConfig config = new RedisConfig("slave", port, masterPort, masterHost);
-
-                server = new TcpServer(config);
+                config = new RedisConfig("slave", port, masterPort, masterHost);
             }
             else
             {
-                RedisConfig config = new RedisConfig(port);
-
-                server = new TcpServer(config);
+                config = new RedisConfig(port);
             }
         }
         else 
         {
-            RedisConfig config = new RedisConfig();
-
-            server = new TcpServer(config);
+            config = new RedisConfig();
         }
-        await server.StartAsync();
+
+
+        var serviceProvider = new ServiceCollection()
+            .AddSingleton(config)
+            .AddSingleton<Store>()
+            .AddSingleton<RespParser>()
+            .AddSingleton<CommandHandler>()
+            .AddSingleton<TcpServer>()
+            .BuildServiceProvider();
+
+        TcpServer app = serviceProvider.GetRequiredService<TcpServer>();
+        await app.StartAsync();
     }
 }
 
