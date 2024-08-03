@@ -36,7 +36,6 @@ class TcpServer
         {
             byte[] buffer = new byte[clientSocket.ReceiveBufferSize];
             await clientSocket.ReceiveAsync(buffer);
-
             
             string[] command = _parser.MakeCommand(buffer);
              
