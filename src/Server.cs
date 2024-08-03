@@ -55,18 +55,18 @@ class Program
             NetworkStream stream = client.GetStream();
 
             string[] ping =["PING"];
-            stream.Write(Encoding.UTF8.GetBytes(parser.RespArray(ping)));
+            stream.WriteAsync(Encoding.UTF8.GetBytes(parser.RespArray(ping)));
             //StreamReader reader = new StreamReader(stream,Encoding.UTF8);
             //Console.WriteLine("Response from master: " + reader.ReadToEnd());//+PONG
 
             string[] ReplconfPort = ["REPLCONF", "listening-port", config.port.ToString()];
 
-            stream.Write(Encoding.UTF8.GetBytes(parser.RespArray(ReplconfPort)));
+            stream.WriteAsync(Encoding.UTF8.GetBytes(parser.RespArray(ReplconfPort)));
             //StreamReader reader = new StreamReader(stream, Encoding.UTF8);
             //Console.WriteLine("Response from master: " + reader.ReadToEnd());//+OK
 
             string[] ReplconfCapa = ["REPLCONF", "capa", "psync2"];
-            stream.Write(Encoding.UTF8.GetBytes(parser.RespArray(ReplconfCapa)));
+            stream.WriteAsync(Encoding.UTF8.GetBytes(parser.RespArray(ReplconfCapa)));
             //StreamReader reader = new StreamReader(stream, Encoding.UTF8);
             //Console.WriteLine("Response from master: " + reader.ReadToEnd());//+OK
         }
