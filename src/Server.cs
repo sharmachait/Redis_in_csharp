@@ -39,8 +39,8 @@ class Program
 
                     string ReplconfCapa = "*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n";
                     stream.Write(Encoding.UTF8.GetBytes(ReplconfCapa));
-                    StreamReader reader = new StreamReader(stream, Encoding.UTF8);
-                    Console.WriteLine("Response from master: " + reader.ReadToEnd());//+OK
+                    //StreamReader reader = new StreamReader(stream, Encoding.UTF8);
+                    //Console.WriteLine("Response from master: " + reader.ReadToEnd());//+OK
                 }
             }
             else
