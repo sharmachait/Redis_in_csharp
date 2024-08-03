@@ -33,7 +33,7 @@ class Program
                     //Console.WriteLine("Response from master: " + reader.ReadToEnd());//+PONG
 
                     string ReplconfPort = $"*3\r\n$8\r\nREPLCONF\r\n$14\r\nlistening-port\r\n$4\r\n{config.port}\r\n";
-                    stream.Write(Encoding.UTF8.GetBytes(ping));
+                    stream.Write(Encoding.UTF8.GetBytes(ReplconfPort));
                     StreamReader reader = new StreamReader(stream, Encoding.UTF8);
                     Console.WriteLine("Response from master: " + reader.ReadToEnd());
 
