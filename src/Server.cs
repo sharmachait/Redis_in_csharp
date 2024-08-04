@@ -93,7 +93,7 @@ class Program
 
 
             string Psync = "*3\r\n$5\r\nPSYNC\r\n$1\r\n?\r\n$2\r\n-1\r\n";
-            stream.Write(Encoding.UTF8.GetBytes(ReplconfCapa));
+            stream.Write(Encoding.UTF8.GetBytes(Psync));
 
             response = reader.ReadLine();
             Console.WriteLine("psync response: "+response);
