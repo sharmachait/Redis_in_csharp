@@ -68,13 +68,11 @@ class Program
             
 
 
-
-            /*string ReplconfPort = $"*3\r\n$8\r\nREPLCONF\r\n$14\r\nlistening-port\r\n$4\r\n{config.port}\r\n";*/
             string[] ReplconfPortCommand = ["REPLCONF", "listening-port", config.port.ToString()];
+
             stream.Write(Encoding.UTF8.GetBytes(parser.RespArray(ReplconfPortCommand)));
 
             response = reader.ReadLine();
-            Console.WriteLine("port response: "+ response);
 
             if (!"+OK".Equals(response))
                 return null;
@@ -83,7 +81,8 @@ class Program
 
 
             string ReplconfCapa = "*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n";
-            stream.Write(Encoding.UTF8.GetBytes(ReplconfCapa));
+            string[] ReplconfCapaCommand = ["REPLCONF", "capa", "psync2"];
+            stream.Write(Encoding.UTF8.GetBytes(parser.RespArray(ReplconfCapaCommand)));
 
             response = reader.ReadLine();
             Console.WriteLine("capa response: "+ response);
