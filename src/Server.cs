@@ -53,23 +53,33 @@ class Program
         using (TcpClient client = new TcpClient(masterHost, masterPort))
         {
             NetworkStream stream = client.GetStream();
+            StreamReader reader = new StreamReader(stream, Encoding.UTF8);
 
             string ping = "*1\r\n$4\r\nPING\r\n";
             string[] pingArr = ["PING"];
-            //Console.WriteLine(parser.RespArray(pingArr)); 
+            
             stream.Write(Encoding.UTF8.GetBytes(ping));
-            //StreamReader reader = new StreamReader(stream,Encoding.UTF8);
-            //Console.WriteLine("Response from master: " + reader.ReadToEnd());//+PONG
+            
+            if (!"+PONG".Equals(reader.ReadLine()))
+                return null;
+            
 
             string ReplconfPort = $"*3\r\n$8\r\nREPLCONF\r\n$14\r\nlistening-port\r\n$4\r\n{config.port}\r\n";
             stream.Write(Encoding.UTF8.GetBytes(ReplconfPort));
-            //StreamReader reader = new StreamReader(stream, Encoding.UTF8);
-            //Console.WriteLine("Response from master: " + reader.ReadToEnd());//+OK
+
+            if (!"+OK".Equals(reader.ReadLine()))
+                return null;
 
             string ReplconfCapa = "*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n";
             stream.Write(Encoding.UTF8.GetBytes(ReplconfCapa));
-            //StreamReader reader = new StreamReader(stream, Encoding.UTF8);
-            //Console.WriteLine("Response from master: " + reader.ReadToEnd());//+OK
+
+            if (!"+OK".Equals(reader.ReadLine()))
+                return null;
+
+            string Psync = "*3\r\n$5\r\nPSYNC\r\n$1\r\n?\r\n$2\r\n-1\r\n";
+            stream.Write(Encoding.UTF8.GetBytes(ReplconfCapa));
+
+            Console.WriteLine(reader.ReadLine());
         }
         return config;
 
