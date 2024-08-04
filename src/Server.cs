@@ -98,7 +98,10 @@ class Program
             response = reader.ReadLine();
             Console.WriteLine("psync response: "+response);
 
-
+            if (response == null ||  ! "+FULLRESYNC".Equals(response.Substring(0, response.IndexOf(" "))))
+            {
+                return null;
+            }
 
         }
         return config;
