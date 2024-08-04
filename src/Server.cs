@@ -60,8 +60,8 @@ class Program
 
             string ping = "*1\r\n$4\r\nPING\r\n";
             string[] pingCommand = ["PING"];
-            Console.WriteLine(ping.Equals(parser.RespArray(pingCommand)));
-            stream.Write(Encoding.UTF8.GetBytes(ping));
+            
+            stream.Write(Encoding.UTF8.GetBytes(parser.RespArray(pingCommand)));
 
             string response = reader.ReadLine();
             Console.WriteLine("ping response: "+ response);
