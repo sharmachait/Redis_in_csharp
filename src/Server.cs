@@ -55,16 +55,13 @@ class Program
             NetworkStream stream = client.GetStream();
             StreamReader reader = new StreamReader(stream, Encoding.UTF8);
 
+            
 
-
-
-            string ping = "*1\r\n$4\r\nPING\r\n";
             string[] pingCommand = ["PING"];
             
             stream.Write(Encoding.UTF8.GetBytes(parser.RespArray(pingCommand)));
 
             string response = reader.ReadLine();
-            Console.WriteLine("ping response: "+ response);
 
             if (!"+PONG".Equals(response))
                 return null;
@@ -72,8 +69,9 @@ class Program
 
 
 
-            string ReplconfPort = $"*3\r\n$8\r\nREPLCONF\r\n$14\r\nlistening-port\r\n$4\r\n{config.port}\r\n";
-            stream.Write(Encoding.UTF8.GetBytes(ReplconfPort));
+            /*string ReplconfPort = $"*3\r\n$8\r\nREPLCONF\r\n$14\r\nlistening-port\r\n$4\r\n{config.port}\r\n";*/
+            string[] ReplconfPortCommand = ["REPLCONF", "listening-port", config.port.ToString()];
+            stream.Write(Encoding.UTF8.GetBytes(parser.RespArray(ReplconfPortCommand)));
 
             response = reader.ReadLine();
             Console.WriteLine("port response: "+ response);
