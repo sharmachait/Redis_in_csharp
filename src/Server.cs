@@ -55,31 +55,51 @@ class Program
             NetworkStream stream = client.GetStream();
             StreamReader reader = new StreamReader(stream, Encoding.UTF8);
 
-            string ping = "*1\r\n$4\r\nPING\r\n";
-            string[] pingArr = ["PING"];
-            
+
+
+
+            string ping = "*1\r\n$4\r\nPING\r\n";            
             stream.Write(Encoding.UTF8.GetBytes(ping));
-            
-            if (!"+PONG".Equals(reader.ReadLine()))
+
+            string response = reader.ReadLine();
+            Console.WriteLine("ping response: "+ response);
+
+            if (!"+PONG".Equals(response))
                 return null;
             
+
 
             string ReplconfPort = $"*3\r\n$8\r\nREPLCONF\r\n$14\r\nlistening-port\r\n$4\r\n{config.port}\r\n";
             stream.Write(Encoding.UTF8.GetBytes(ReplconfPort));
 
-            if (!"+OK".Equals(reader.ReadLine()))
+            response = reader.ReadLine();
+            Console.WriteLine("port response: "+ response);
+
+            if (!"+OK".Equals(response))
                 return null;
+
+
 
             string ReplconfCapa = "*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n";
             stream.Write(Encoding.UTF8.GetBytes(ReplconfCapa));
 
-            if (!"+OK".Equals(reader.ReadLine()))
+            response = reader.ReadLine();
+            Console.WriteLine("capa response: "+ response);
+
+            if (!"+OK".Equals(response))
                 return null;
+
+
+
 
             string Psync = "*3\r\n$5\r\nPSYNC\r\n$1\r\n?\r\n$2\r\n-1\r\n";
             stream.Write(Encoding.UTF8.GetBytes(ReplconfCapa));
 
-            Console.WriteLine(reader.ReadLine());
+            response = reader.ReadLine();
+            Console.WriteLine("psync response: "+response);
+
+
+
         }
         return config;
 
