@@ -22,7 +22,7 @@ class Program
                 string masterHost = args[replicaFlag + 1].Split(' ')[0];
                 int masterPort = int.Parse(args[replicaFlag + 1].Split(' ')[1]);
 
-                config = InitiateSlavery( port, masterHost, masterPort);
+                config = InitiateSlavery( port, masterHost, masterPort );
             }
             else
             {
@@ -58,7 +58,9 @@ class Program
 
 
 
-            string ping = "*1\r\n$4\r\nPING\r\n";            
+            string ping = "*1\r\n$4\r\nPING\r\n";
+            string[] pingCommand = ["PING"];
+            Console.WriteLine(ping.Equals(parser.RespArray(pingCommand)));
             stream.Write(Encoding.UTF8.GetBytes(ping));
 
             string response = reader.ReadLine();
@@ -69,6 +71,7 @@ class Program
             
 
 
+
             string ReplconfPort = $"*3\r\n$8\r\nREPLCONF\r\n$14\r\nlistening-port\r\n$4\r\n{config.port}\r\n";
             stream.Write(Encoding.UTF8.GetBytes(ReplconfPort));
 
@@ -77,6 +80,7 @@ class Program
 
             if (!"+OK".Equals(response))
                 return null;
+
 
 
 
