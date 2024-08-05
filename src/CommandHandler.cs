@@ -28,10 +28,18 @@ public class CommandHandler
                 return _store.Get(command, currTime);
                 
             case "set":
+                if (_config.role.Equals("slave")) {
+                    return "Slave instances are allowed read-only access";
+                }
                 return _store.Set(command, currTime);
                 
             case "info":
                 return Info(command);
+            case "replconf":
+                foreach (string c in command) {
+                    Console.Write(c + " ");
+                }
+                return "";
                 
             default:
                 return "+No Response\r\n";

@@ -8,12 +8,15 @@ class TcpServer
     private readonly TcpListener _server;
     private readonly RespParser _parser ;
     private readonly CommandHandler _handler;
+    private readonly RedisConfig _config;
 
     public TcpServer(RedisConfig config, Store store, RespParser parser, CommandHandler handler)
     {
         _handler = handler;
 
         _parser = parser;
+
+        _config = config;
 
         _server = new TcpListener(IPAddress.Any, config.port);
     }
@@ -28,6 +31,61 @@ class TcpServer
             Socket socket = await _server.AcceptSocketAsync();
             HandleClientAsync(socket);
         }
+    }
+
+    public async Task<TcpClient?> InitiateSlaveryAsync(int port, string masterHost, int masterPort)
+    {
+        TcpClient client = new TcpClient(masterHost, masterPort);
+
+        NetworkStream stream = client.GetStream();
+        StreamReader reader = new StreamReader(stream, Encoding.UTF8);
+
+        string[] pingCommand = ["PING"];
+
+        stream.Write(Encoding.UTF8.GetBytes(_parser.RespArray(pingCommand)));
+
+        string response = reader.ReadLine();
+
+        if (!"+PONG".Equals(response))
+            return null;
+
+
+
+        string[] ReplconfPortCommand = ["REPLCONF", "listening-port", _config.port.ToString()];
+
+        stream.Write(Encoding.UTF8.GetBytes(_parser.RespArray(ReplconfPortCommand)));
+
+        response = reader.ReadLine();
+
+        if (!"+OK".Equals(response))
+            return null;
+
+
+
+        string[] ReplconfCapaCommand = ["REPLCONF", "capa", "psync2"];
+
+        stream.Write(Encoding.UTF8.GetBytes(_parser.RespArray(ReplconfCapaCommand)));
+
+        response = reader.ReadLine();
+
+        if (!"+OK".Equals(response))
+            return null;
+
+
+
+        string[] PsyncCommand = ["PSYNC", "?", "-1"];
+
+        stream.Write(Encoding.UTF8.GetBytes(_parser.RespArray(PsyncCommand)));
+
+        response = reader.ReadLine();
+
+        if (response == null || !"+FULLRESYNC".Equals(response.Substring(0, response.IndexOf(" "))))
+        {
+            return null;
+        }
+
+        return client;
+        
     }
 
     async Task HandleClientAsync(Socket clientSocket)
@@ -48,6 +106,9 @@ class TcpServer
             string response = _handler.Handle(command);
             await clientSocket.SendAsync(Encoding.UTF8.GetBytes(response));
         }
+        //implement exponential backoff if disconnected
+
+        //polymorphism?
     }
 }
 

@@ -22,7 +22,7 @@ class Program
                 string masterHost = args[replicaFlag + 1].Split(' ')[0];
                 int masterPort = int.Parse(args[replicaFlag + 1].Split(' ')[1]);
 
-                config = InitiateSlavery( port, masterHost, masterPort );
+                config = new RedisConfig("slave", port, masterPort, masterHost);
             }
             else
             {
@@ -44,66 +44,20 @@ class Program
             .BuildServiceProvider();
 
         TcpServer app = serviceProvider.GetRequiredService<TcpServer>();
-        await app.StartAsync();
-    }
 
-    static RedisConfig InitiateSlavery(int port, string masterHost,int masterPort) { 
-        RespParser parser=new RespParser();
-        RedisConfig config = new RedisConfig("slave", port, masterPort, masterHost);
-        using (TcpClient client = new TcpClient(masterHost, masterPort))
+
+        if (config.role.Equals("slave"))
         {
-            NetworkStream stream = client.GetStream();
-            StreamReader reader = new StreamReader(stream, Encoding.UTF8);
-
-            
-
-            string[] pingCommand = ["PING"];
-            
-            stream.Write(Encoding.UTF8.GetBytes(parser.RespArray(pingCommand)));
-
-            string response = reader.ReadLine();
-
-            if (!"+PONG".Equals(response))
-                return null;
-            
-
-
-            string[] ReplconfPortCommand = ["REPLCONF", "listening-port", config.port.ToString()];
-
-            stream.Write(Encoding.UTF8.GetBytes(parser.RespArray(ReplconfPortCommand)));
-
-            response = reader.ReadLine();
-
-            if (!"+OK".Equals(response))
-                return null;
-
-
-
-            string[] ReplconfCapaCommand = ["REPLCONF", "capa", "psync2"];
-
-            stream.Write(Encoding.UTF8.GetBytes(parser.RespArray(ReplconfCapaCommand)));
-
-            response = reader.ReadLine();
-
-            if (!"+OK".Equals(response))
-                return null;
-
-
-
-            string[] PsyncCommand = ["PSYNC", "?", "-1"];
-
-            stream.Write(Encoding.UTF8.GetBytes(parser.RespArray(PsyncCommand)));
-
-            response = reader.ReadLine();
-
-            if (response == null ||  ! "+FULLRESYNC".Equals(response.Substring(0, response.IndexOf(" "))))
-            {
-                return null;
+            TcpClient? slave = await app.InitiateSlaveryAsync(config.port, config.masterHost, config.masterPort);
+            if (slave == null) {
+                Console.WriteLine("Connection not established with master, please retry");
+                return;
             }
 
+            // have a different function to register read only functions?
         }
-        return config;
 
+        await app.StartAsync();
     }
 }
 

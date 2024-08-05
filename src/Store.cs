@@ -35,7 +35,6 @@ public class Store
         {
             return $"$-1\r\n";
         }
-        
     }
 
     public string Get(string[] command, DateTime currTime)
