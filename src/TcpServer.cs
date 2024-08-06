@@ -29,9 +29,7 @@ class TcpServer
         while (true)
         {
             Socket socket = await _server.AcceptSocketAsync();
-            Console.WriteLine("**************************************************************************");
-            Console.WriteLine("contorle Reached here");
-            Console.WriteLine("**************************************************************************");
+
             TcpClient ConnectedClient = _server.AcceptTcpClient();
             IPEndPoint remoteIpEndPoint = ConnectedClient.Client.RemoteEndPoint as IPEndPoint;
             string clientIpAddress = remoteIpEndPoint.Address.ToString();
@@ -46,6 +44,9 @@ class TcpServer
         using (clientSocket)
             while (clientSocket.Connected)
             {
+                Console.WriteLine("**************************************************************************");
+                Console.WriteLine("control Reached here");
+                Console.WriteLine("**************************************************************************");
                 byte[] buffer = new byte[clientSocket.ReceiveBufferSize];
                 await clientSocket.ReceiveAsync(buffer);
 
