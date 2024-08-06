@@ -28,7 +28,7 @@ class TcpServer
 
         while (true)
         {
-            Socket socket = await _server.AcceptSocketAsync();
+            //Socket socket = await _server.AcceptSocketAsync();
 
             TcpClient ConnectedClient = _server.AcceptTcpClient();
             IPEndPoint remoteIpEndPoint = ConnectedClient.Client.RemoteEndPoint as IPEndPoint;
@@ -36,19 +36,21 @@ class TcpServer
 
             Console.WriteLine("clientIpAddress: => " + clientIpAddress);
 
-            _ = Task.Run(() => HandleClientAsync(socket, clientIpAddress));
+            _ = Task.Run(() => HandleClientAsync(ConnectedClient, clientIpAddress));
         }
     }
-    async Task HandleClientAsync(Socket clientSocket, string clientIpAddress)
+    async Task HandleClientAsync(TcpClient ConnectedClient, string clientIpAddress)
     {
-        using (clientSocket)
-            while (clientSocket.Connected)
+        using (ConnectedClient)
+        using (NetworkStream stream = ConnectedClient.GetStream())
+        {
+            while (ConnectedClient.Connected)
             {
                 Console.WriteLine("**************************************************************************");
                 Console.WriteLine("control Reached here");
                 Console.WriteLine("**************************************************************************");
-                byte[] buffer = new byte[clientSocket.ReceiveBufferSize];
-                await clientSocket.ReceiveAsync(buffer);
+                byte[] buffer = new byte[ConnectedClient.ReceiveBufferSize];
+                await stream.ReadAsync(buffer, 0, buffer.Length);
 
                 string[] command = _parser.MakeCommand(buffer);
 
@@ -59,8 +61,10 @@ class TcpServer
                 }
 
                 string response = _handler.Handle(command, clientIpAddress);
-                await clientSocket.SendAsync(Encoding.UTF8.GetBytes(response));
+                await stream.WriteAsync(Encoding.UTF8.GetBytes(response));
             }
+        }
+            
         //implement exponential backoff if disconnected
 
         //polymorphism?
