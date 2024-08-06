@@ -48,13 +48,12 @@ class Program
 
         if (config.role.Equals("slave"))
         {
-            TcpClient? slave = await app.InitiateSlaveryAsync(config.port, config.masterHost, config.masterPort);
-            if (slave == null) {
+            TcpClient? ConnectionWithMaster = await app.InitiateSlaveryAsync(config.port, config.masterHost, config.masterPort);
+            if (ConnectionWithMaster == null)
+            {
                 Console.WriteLine("Connection not established with master, please retry");
                 return;
             }
-
-            // have a different function to register read only functions?
         }
 
         await app.StartAsync();

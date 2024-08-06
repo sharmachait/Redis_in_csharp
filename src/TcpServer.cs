@@ -29,8 +29,38 @@ class TcpServer
         while (true)
         {
             Socket socket = await _server.AcceptSocketAsync();
-            HandleClientAsync(socket);
+            
+            TcpClient ConnectedClient = _server.AcceptTcpClient();
+            IPEndPoint remoteIpEndPoint = ConnectedClient.Client.RemoteEndPoint as IPEndPoint;
+            string clientIpAddress = remoteIpEndPoint.Address.ToString();
+
+            Console.WriteLine("clientIpAddress: => " + clientIpAddress);
+
+            _ = Task.Run(() => HandleClientAsync(socket, clientIpAddress));
         }
+    }
+    async Task HandleClientAsync(Socket clientSocket, string clientIpAddress)
+    {
+        using (clientSocket)
+            while (clientSocket.Connected)
+            {
+                byte[] buffer = new byte[clientSocket.ReceiveBufferSize];
+                await clientSocket.ReceiveAsync(buffer);
+
+                string[] command = _parser.MakeCommand(buffer);
+
+                Console.WriteLine("Command Parsed: ");
+                foreach (string cmd in command)
+                {
+                    Console.Write(cmd + " ");
+                }
+
+                string response = _handler.Handle(command, clientIpAddress);
+                await clientSocket.SendAsync(Encoding.UTF8.GetBytes(response));
+            }
+        //implement exponential backoff if disconnected
+
+        //polymorphism?
     }
 
     public async Task<TcpClient?> InitiateSlaveryAsync(int port, string masterHost, int masterPort)
@@ -86,29 +116,6 @@ class TcpServer
 
         return client;
         
-    }
-
-    async Task HandleClientAsync(Socket clientSocket)
-    {
-        while (clientSocket.Connected)
-        {
-            byte[] buffer = new byte[clientSocket.ReceiveBufferSize];
-            await clientSocket.ReceiveAsync(buffer);
-            
-            string[] command = _parser.MakeCommand(buffer);
-             
-            Console.WriteLine("Command Parsed: ");
-            foreach (string cmd in command)
-            {
-                Console.Write(cmd + " ");
-            }
-            
-            string response = _handler.Handle(command);
-            await clientSocket.SendAsync(Encoding.UTF8.GetBytes(response));
-        }
-        //implement exponential backoff if disconnected
-
-        //polymorphism?
     }
 }
 

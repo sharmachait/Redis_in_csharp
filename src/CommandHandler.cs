@@ -13,9 +13,10 @@ public class CommandHandler
         _config = config;
     }
 
-    public string Handle(string[] command) {
+    public string Handle(string[] command, string clientIpAddress) {
         string cmd = command[0];
         DateTime currTime = DateTime.Now;
+
         switch (cmd)
         {
             case "ping":
@@ -28,13 +29,22 @@ public class CommandHandler
                 return _store.Get(command, currTime);
                 
             case "set":
-                if (_config.role.Equals("slave")) {
-                    return "Slave instances are allowed read-only access";
+                if (_config.role.Equals("slave"))
+                {
+                    if (_config.masterHost.Equals(clientIpAddress))
+                    {
+                        return _store.Set(command, currTime);
+                    }
+                    else
+                    {
+                        return _parser.RespBulkString("READONLY You can't write against a read only replica.");
+                    }
                 }
                 return _store.Set(command, currTime);
-                
+
             case "info":
                 return Info(command);
+
             case "replconf":
                 foreach (string c in command) {
                     Console.Write(c + " ");
