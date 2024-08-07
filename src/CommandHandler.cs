@@ -95,7 +95,7 @@ public class CommandHandler
                     Console.WriteLine("**************************************************************************************");
                     Console.WriteLine("ClienPort " + clientPort);
                     Console.WriteLine("listening port " + command[2]);
-                    Slave s = new Slave(clientPort, clientIpAddress);
+                    Slave s = new Slave(int.Parse(command[2]), clientIpAddress);
                     _infra.clients.Add(s);
                     return _parser.RespBulkString("OK");
                 }
