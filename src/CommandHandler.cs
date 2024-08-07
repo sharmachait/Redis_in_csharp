@@ -102,6 +102,8 @@ public class CommandHandler
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine("**************************************************************************************");
+                    Console.WriteLine(e.Message);
                     return _parser.RespBulkString("NOTOK");
                 }
             case "capa":
