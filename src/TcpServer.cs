@@ -1,6 +1,4 @@
 ﻿namespace codecrafters_redis;
-
-using codecrafters_redis.src;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -35,8 +33,6 @@ class TcpServer
             string clientIpAddress = remoteIpEndPoint.Address.ToString();
             int clientPort = remoteIpEndPoint.Port;
 
-            Console.WriteLine($"Client connected from IP: {clientIpAddress}, Port: {clientPort}");
-
             _ = Task.Run(() => HandleClientAsync(ConnectedClient, remoteIpEndPoint));
         }
     }
@@ -51,12 +47,6 @@ class TcpServer
                 await stream.ReadAsync(buffer, 0, buffer.Length);
 
                 string[] command = _parser.MakeCommand(buffer);
-
-                Console.WriteLine("Command Parsed: ");
-                foreach (string cmd in command)
-                {
-                    Console.Write(cmd + " ");
-                }
 
                 string response = _handler.Handle(command, remoteIpEndPoint);
                 await stream.WriteAsync(Encoding.UTF8.GetBytes(response));

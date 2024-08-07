@@ -86,7 +86,11 @@ public class CommandHandler
 
         string clientIpAddress = remoteIpEndPoint.Address.ToString();
         int clientPort = remoteIpEndPoint.Port;
-
+        Console.WriteLine("**************************************************************************************");
+        foreach (string c in command)
+        {
+            Console.WriteLine(c);
+        }
         switch (command[1])
         {
             case "listening-port":
@@ -108,7 +112,6 @@ public class CommandHandler
                 }
                 return _parser.RespBulkString("OK");
         }
-
 
         return _parser.RespBulkString("OK");
     }
