@@ -92,9 +92,9 @@ public class CommandHandler
             case "listening-port":
                 try
                 {
-                    Console.WriteLine("**************************************************************************************");
-                    Console.WriteLine("ClienPort " + clientPort);
-                    Console.WriteLine("listening port " + command[2]);
+                    //Console.WriteLine("**************************************************************************************");
+                    //Console.WriteLine("ClienPort " + clientPort);
+                    //Console.WriteLine("listening port " + command[2]);
                     Slave s = new Slave(int.Parse(command[2]), clientIpAddress);
                     _infra.clients.Add(s);
                     return _parser.RespBulkString("OK");
@@ -105,8 +105,21 @@ public class CommandHandler
                     return _parser.RespBulkString("NOTOK");
                 }
             case "capa":
+                
                 int idx = _infra.clients.FindIndex((x) => { return x.ipaddress.Equals(clientIpAddress); });
-                _infra.clients[idx].capabilities.Add(command[2]);
+                for (int i = 0; i < command.Length; i++) 
+                {
+                    if (command[i].Equals("capa"))
+                    {
+                        _infra.clients[idx].capabilities.Add(command[i+1]);
+                    }
+                }
+                Console.WriteLine("**************************************************************************************");
+                for (int i = 0; i < _infra.clients[0].capabilities.Count; i++)
+                {
+                    Console.WriteLine(_infra.clients[0].capabilities);
+                }
+                
                 return _parser.RespBulkString("OK");
         }
 
