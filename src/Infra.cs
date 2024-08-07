@@ -2,7 +2,7 @@
 {
     public class Infra
     {
-        public List<Slave> clients;
+        public List<Slave> clients = new List<Slave>();
     }
 
     public class Slave 
