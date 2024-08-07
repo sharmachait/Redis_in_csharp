@@ -1,3 +1,4 @@
+using codecrafters_redis.src;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Sockets;
 using System.Text;
@@ -38,6 +39,7 @@ class Program
         var serviceProvider = new ServiceCollection()
             .AddSingleton(config)
             .AddSingleton<Store>()
+            .AddSingleton<Infra>()
             .AddSingleton<RespParser>()
             .AddSingleton<CommandHandler>()
             .AddSingleton<TcpServer>()

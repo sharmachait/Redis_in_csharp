@@ -1,4 +1,6 @@
 ﻿namespace codecrafters_redis;
+
+using codecrafters_redis.src;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -28,27 +30,23 @@ class TcpServer
 
         while (true)
         {
-            //Socket socket = await _server.AcceptSocketAsync();
-
             TcpClient ConnectedClient = _server.AcceptTcpClient();
             IPEndPoint remoteIpEndPoint = ConnectedClient.Client.RemoteEndPoint as IPEndPoint;
             string clientIpAddress = remoteIpEndPoint.Address.ToString();
+            int clientPort = remoteIpEndPoint.Port;
 
-            Console.WriteLine("clientIpAddress: => " + clientIpAddress);
+            Console.WriteLine($"Client connected from IP: {clientIpAddress}, Port: {clientPort}");
 
-            _ = Task.Run(() => HandleClientAsync(ConnectedClient, clientIpAddress));
+            _ = Task.Run(() => HandleClientAsync(ConnectedClient, remoteIpEndPoint));
         }
     }
-    async Task HandleClientAsync(TcpClient ConnectedClient, string clientIpAddress)
+    async Task HandleClientAsync(TcpClient ConnectedClient, IPEndPoint remoteIpEndPoint)
     {
         using (ConnectedClient)
         using (NetworkStream stream = ConnectedClient.GetStream())
         {
             while (ConnectedClient.Connected)
             {
-                Console.WriteLine("**************************************************************************");
-                Console.WriteLine("control Reached here");
-                Console.WriteLine("**************************************************************************");
                 byte[] buffer = new byte[ConnectedClient.ReceiveBufferSize];
                 await stream.ReadAsync(buffer, 0, buffer.Length);
 
@@ -60,7 +58,7 @@ class TcpServer
                     Console.Write(cmd + " ");
                 }
 
-                string response = _handler.Handle(command, clientIpAddress);
+                string response = _handler.Handle(command, remoteIpEndPoint);
                 await stream.WriteAsync(Encoding.UTF8.GetBytes(response));
             }
         }
@@ -117,9 +115,8 @@ class TcpServer
         response = reader.ReadLine();
 
         if (response == null || !"+FULLRESYNC".Equals(response.Substring(0, response.IndexOf(" "))))
-        {
             return null;
-        }
+
 
         return client;
         
