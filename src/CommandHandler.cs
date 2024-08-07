@@ -86,32 +86,27 @@ public class CommandHandler
 
         string clientIpAddress = remoteIpEndPoint.Address.ToString();
         int clientPort = remoteIpEndPoint.Port;
-        Console.WriteLine("**************************************************************************************");
-        foreach (string c in command)
-        {
-            Console.WriteLine(c);
-        }
+
         switch (command[1])
         {
             case "listening-port":
                 try
                 {
+                    Console.WriteLine("**************************************************************************************");
+                    Console.WriteLine("ClienPort " + clientPort);
+                    Console.WriteLine("listening port " + command[2]);
                     Slave s = new Slave(clientPort, clientIpAddress);
                     _infra.clients.Add(s);
                     return _parser.RespBulkString("OK");
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("**************************************************************************************");
                     Console.WriteLine(e.Message);
                     return _parser.RespBulkString("NOTOK");
                 }
             case "capa":
-                Console.WriteLine("Capabilities: ");
-                foreach (string c in command)
-                {
-                    Console.WriteLine(c);
-                }
+                int idx = _infra.clients.FindIndex((x) => { return x.ipaddress.Equals(clientIpAddress); });
+                _infra.clients[idx].capabilities.Add(command[2]);
                 return _parser.RespBulkString("OK");
         }
 
