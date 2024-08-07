@@ -117,7 +117,7 @@ public class CommandHandler
                 Console.WriteLine("**************************************************************************************");
                 for (int i = 0; i < _infra.clients[0].capabilities.Count; i++)
                 {
-                    Console.WriteLine(_infra.clients[0].capabilities);
+                    Console.WriteLine(_infra.clients[0].capabilities[i]);
                 }
                 
                 return _parser.RespBulkString("OK");
