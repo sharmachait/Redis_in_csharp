@@ -135,7 +135,7 @@ public class CommandHandler
                 Console.WriteLine("************************************************************************************");
                 Console.WriteLine("response: " + response);
                 await client.SendAsync(
-                    "response"
+                    response
                 );
 
                 return "";
