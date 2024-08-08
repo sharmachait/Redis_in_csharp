@@ -132,12 +132,13 @@ public class CommandHandler
                 byte[] rdbFile = System.Convert.FromBase64String(emptyRdbFileBase64);
                 
                 string response = $"${rdbFile.Length}\r\n{emptyRdbFileBase64}";
-
+                Console.WriteLine("************************************************************************************");
+                Console.WriteLine("response: " + response);
                 await client.SendAsync(
                     "response"
                 );
 
-                return response;
+                return "";
             }
             else
             {
