@@ -7,6 +7,7 @@ public class RedisConfig
     public string masterHost;
     public string masterReplId;
     public long masterReplOffset;
+    
 
     public RedisConfig(string role, int port, int masterPort, string masterHost)
     {
@@ -20,6 +21,7 @@ public class RedisConfig
 
     public RedisConfig(int port)
     {
+        
         this.role = "master";
         this.port = port;
         this.masterHost = ".";
@@ -30,6 +32,7 @@ public class RedisConfig
 
     public RedisConfig()
     {
+        
         this.role = "master";
         this.port = 6379;
         this.masterHost = ".";
@@ -39,3 +42,5 @@ public class RedisConfig
     }
 
 }
+
+

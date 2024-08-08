@@ -1,4 +1,7 @@
 ﻿namespace codecrafters_redis;
+
+using codecrafters_redis.src;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -9,8 +12,10 @@ class TcpServer
     private readonly RespParser _parser ;
     private readonly CommandHandler _handler;
     private readonly RedisConfig _config;
+    private readonly Infra _infra;
+    private int id;
 
-    public TcpServer(RedisConfig config, Store store, RespParser parser, CommandHandler handler)
+    public TcpServer(RedisConfig config, Store store, RespParser parser, CommandHandler handler, Infra infra)
     {
         _handler = handler;
 
@@ -18,45 +23,50 @@ class TcpServer
 
         _config = config;
 
+        _infra = infra;
+
+        id = 0;
+
         _server = new TcpListener(IPAddress.Any, config.port);
     }
 
-    public async Task StartAsync()
+    public void Start()
     {
         _server.Start();
         Console.WriteLine("Server started..." );
 
         while (true)
         {
-            TcpClient ConnectedClient = _server.AcceptTcpClient();
-            IPEndPoint remoteIpEndPoint = ConnectedClient.Client.RemoteEndPoint as IPEndPoint;
-            string clientIpAddress = remoteIpEndPoint.Address.ToString();
-            int clientPort = remoteIpEndPoint.Port;
+            TcpClient socket = _server.AcceptTcpClient();
+            id++;
+            IPEndPoint? remoteIpEndPoint = socket.Client.RemoteEndPoint as IPEndPoint;
+            if (remoteIpEndPoint == null)
+                return;
+            NetworkStream stream = socket.GetStream();
+            Client client = new Client(socket, remoteIpEndPoint,stream,id);
 
-            _ = Task.Run(() => HandleClientAsync(ConnectedClient, remoteIpEndPoint));
+            _infra.clients.Add(client);
+
+            _ = Task.Run(() => HandleClientAsync(client));
         }
     }
-    async Task HandleClientAsync(TcpClient ConnectedClient, IPEndPoint remoteIpEndPoint)
+
+    public async Task HandleClientAsync(Client client)
     {
-        using (ConnectedClient)
-        using (NetworkStream stream = ConnectedClient.GetStream())
+        
+        while (client.socket.Connected)
         {
-            while (ConnectedClient.Connected)
-            {
-                byte[] buffer = new byte[ConnectedClient.ReceiveBufferSize];
-                await stream.ReadAsync(buffer, 0, buffer.Length);
+            byte[] buffer = new byte[client.socket.ReceiveBufferSize];
+            await client.stream.ReadAsync(buffer, 0, buffer.Length);
 
-                string[] command = _parser.MakeCommand(buffer);
+            string[] command = _parser.MakeCommand(buffer);
 
-                string response = _handler.Handle(command, remoteIpEndPoint);
-                await stream.WriteAsync(Encoding.UTF8.GetBytes(response));
-            }
+            string response = await _handler.Handle(command, client);
+            await client.SendAsync(response);
         }
-            
-        //implement exponential backoff if disconnected
-
-        //polymorphism?
+        
     }
+
 
     public async Task<TcpClient?> InitiateSlaveryAsync(int port, string masterHost, int masterPort)
     {

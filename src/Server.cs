@@ -50,7 +50,9 @@ class Program
 
         if (config.role.Equals("slave"))
         {
-            TcpClient? ConnectionWithMaster = await app.InitiateSlaveryAsync(config.port, config.masterHost, config.masterPort);
+            TcpClient? ConnectionWithMaster = await app.InitiateSlaveryAsync(
+                config.port, config.masterHost, config.masterPort
+            );
             if (ConnectionWithMaster == null)
             {
                 Console.WriteLine("Connection not established with master, please retry");
@@ -58,7 +60,7 @@ class Program
             }
         }
 
-        await app.StartAsync();
+        app.Start();
     }
 }
 

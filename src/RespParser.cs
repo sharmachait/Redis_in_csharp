@@ -16,7 +16,7 @@ public class RespParser
         {
             return ParseArray(parts);
         }
-        return new string[] { "fuck","you"};
+        return new string[] { "No","command"};
     }
 
     public string[] ParseArray(string[] parts)
@@ -38,7 +38,7 @@ public class RespParser
     }
     public string RespArray(string[] a) {
         var s= "*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n";
-        //Console.WriteLine("dkhghdkfjhgd " + s);
+        
         List<string> res = new List<string>();
 
         int len = a.Length;
@@ -51,6 +51,11 @@ public class RespParser
         }
 
         return string.Join("\r\n",res)+"\r\n";
+    }
+    public string RespRdbFile(byte[] bytes)
+    {
+        string res = $"{bytes.Length}\r\n{bytes.ToString()}";
+        return res;
     }
 }
 

@@ -18,7 +18,10 @@ public class CommandHandler
         _config = config;
     }
 
-    public string Handle(string[] command, IPEndPoint remoteIpEndPoint) {
+
+
+
+    public async Task<string> Handle(string[] command, Client client) {
         string cmd = command[0];
         DateTime currTime = DateTime.Now;
         string res = "";
@@ -37,7 +40,7 @@ public class CommandHandler
                 break;
 
             case "set":
-                res = Set(remoteIpEndPoint, command,currTime);
+                res = Set(client.remoteIpEndPoint, command,currTime);
                 break;
 
             case "info":
@@ -45,10 +48,10 @@ public class CommandHandler
                 break;
 
             case "replconf":
-                res = ReplConf(command, remoteIpEndPoint);
+                res = ReplConf(command, client.remoteIpEndPoint);
                 break;
             case "psync":
-                res = Psync(command,remoteIpEndPoint);
+                res = await Psync(command, client);
                 break;
             default:
                 res = "+No Response\r\n";
@@ -56,6 +59,10 @@ public class CommandHandler
         }
         return res;
     }
+
+
+
+
     
     public string Info(string[] command)
     {
@@ -76,6 +83,10 @@ public class CommandHandler
         }
     }
 
+
+
+
+
     public string Set(IPEndPoint remoteIpEndPoint, string[] command, DateTime currTime)
     {
         if (_config.role.Equals("slave"))
@@ -94,22 +105,30 @@ public class CommandHandler
         }
         return _store.Set(command, currTime);
     }
-    public string Psync(string[] command, IPEndPoint remoteIpEndPoint)
+
+
+
+
+    public async Task<string> Psync(string[] command, Client client)
     {
         try
         {
-            string clientIpAddress = remoteIpEndPoint.Address.ToString();
-            int clientPort = remoteIpEndPoint.Port;
+            string clientIpAddress = client.remoteIpEndPoint.Address.ToString();
+            int clientPort = client.remoteIpEndPoint.Port;
 
             string replicationIdMaster = command[1];
             string replicationOffsetMaster = command[2];
 
             if (replicationIdMaster.Equals("?") && replicationOffsetMaster.Equals("-1"))
             {
-                int idx = _infra.clients.FindIndex((x) => { return x.ipaddress.Equals(clientIpAddress); });
-                _infra.clientsToFullSync.Add(_infra.clients[idx]);
+                int idx = _infra.slaves.FindIndex((x) => { return x.ipaddress.Equals(clientIpAddress); });
 
-                return $"+FULLRESYNC {_config.masterReplId} {_config.masterReplOffset}\r\n";
+                await client.SendAsync(
+                    $"+FULLRESYNC {_config.masterReplId} {_config.masterReplOffset}\r\n"
+                );
+                string rdbFileBase64 = "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==";
+                byte[] bytes = Convert.FromBase64String(rdbFileBase64);
+                return _parser.RespRdbFile(bytes);
             }
             else
             {
@@ -123,9 +142,12 @@ public class CommandHandler
         }
     }
 
+
+
+
+
     public string ReplConf(string[] command, IPEndPoint remoteIpEndPoint)
     {
-
         string clientIpAddress = remoteIpEndPoint.Address.ToString();
         int clientPort = remoteIpEndPoint.Port;
 
@@ -135,7 +157,7 @@ public class CommandHandler
                 try
                 {
                     Slave s = new Slave(int.Parse(command[2]), clientIpAddress);
-                    _infra.clients.Add(s);
+                    _infra.slaves.Add(s);
                     return _parser.RespBulkString("OK");
                 }
                 catch (Exception e)
@@ -144,21 +166,32 @@ public class CommandHandler
                     return _parser.RespBulkString("NOTOK");
                 }
             case "capa":
-                
-                int idx = _infra.clients.FindIndex((x) => { return x.ipaddress.Equals(clientIpAddress); });
-                for (int i = 0; i < command.Length; i++) 
+                try
                 {
-                    if (command[i].Equals("capa"))
+                    int idx = _infra.slaves.FindIndex((x) => { return x.ipaddress.Equals(clientIpAddress); });
+                    for (int i = 0; i < command.Length; i++)
                     {
-                        _infra.clients[idx].capabilities.Add(command[i+1]);
+                        if (command[i].Equals("capa"))
+                        {
+                            _infra.slaves[idx].capabilities.Add(command[i + 1]);
+                        }
                     }
+
+                    return _parser.RespBulkString("OK");
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    return _parser.RespBulkString("NOTOK");
                 }
                 
-                return _parser.RespBulkString("OK");
         }
-
         return _parser.RespBulkString("OK");
     }
+
+
+
+
 
     public string Replication()
     {
