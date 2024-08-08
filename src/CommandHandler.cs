@@ -134,7 +134,7 @@ public class CommandHandler
                 string response = $"${rdbFile.Length}\r\n{emptyRdbFileBase64}";
 
                 await client.SendAsync(
-                    response
+                    "response"
                 );
 
                 return response;
