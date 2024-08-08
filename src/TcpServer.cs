@@ -62,8 +62,7 @@ class TcpServer
             string[] command = _parser.MakeCommand(buffer);
 
             string response = await _handler.Handle(command, client);
-            Console.WriteLine("************************************************************************************");
-            Console.WriteLine("response: " + response);
+            
             await client.SendAsync(response);
         }
         
