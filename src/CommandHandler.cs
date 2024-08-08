@@ -21,45 +21,40 @@ public class CommandHandler
     public string Handle(string[] command, IPEndPoint remoteIpEndPoint) {
         string cmd = command[0];
         DateTime currTime = DateTime.Now;
-
+        string res = "";
         switch (cmd)
         {
             case "ping":
-                return "+PONG\r\n";
+                res = "+PONG\r\n";
+                break;
                 
             case "echo":
-                return $"+{command[1]}\r\n";
+                res = $"+{command[1]}\r\n";
+                break;
                 
             case "get":
-                return _store.Get(command, currTime);
-                
-            case "set":
-                if (_config.role.Equals("slave"))
-                {
-                    string clientIpAddress = remoteIpEndPoint.Address.ToString();
-                    int clientPort = remoteIpEndPoint.Port;
+                res = _store.Get(command, currTime);
+                break;
 
-                    if (_config.masterHost.Equals(clientIpAddress))
-                    {
-                        return _store.Set(command, currTime);
-                    }
-                    else
-                    {
-                        return _parser.RespBulkString("READONLY You can't write against a read only replica.");
-                    }
-                }
-                return _store.Set(command, currTime);
+            case "set":
+                res = Set(remoteIpEndPoint, command,currTime);
+                break;
 
             case "info":
-                return Info(command);
+                res = Info(command);
+                break;
 
             case "replconf":
-                return ReplConf(command, remoteIpEndPoint);
-                
+                res = ReplConf(command, remoteIpEndPoint);
+                break;
+            case "psync":
+                res = Psync(command,remoteIpEndPoint);
+                break;
             default:
-                return "+No Response\r\n";
-                
+                res = "+No Response\r\n";
+                break;
         }
+        return res;
     }
     
     public string Info(string[] command)
@@ -81,6 +76,50 @@ public class CommandHandler
         }
     }
 
+    public string Set(IPEndPoint remoteIpEndPoint, string[] command, DateTime currTime)
+    {
+        if (_config.role.Equals("slave"))
+        {
+            string clientIpAddress = remoteIpEndPoint.Address.ToString();
+            int clientPort = remoteIpEndPoint.Port;
+
+            if (_config.masterHost.Equals(clientIpAddress))
+            {
+                return _store.Set(command, currTime);
+            }
+            else
+            {
+                return _parser.RespBulkString("READONLY You can't write against a read only replica.");
+            }
+        }
+        return _store.Set(command, currTime);
+    }
+    public string Psync(string[] command, IPEndPoint remoteIpEndPoint)
+    {
+        try
+        {
+            string clientIpAddress = remoteIpEndPoint.Address.ToString();
+            int clientPort = remoteIpEndPoint.Port;
+
+            string replicationIdMaster = command[1];
+            string replicationOffsetMaster = command[2];
+
+            if (replicationIdMaster.Equals("?") && replicationOffsetMaster.Equals("-1"))
+            {
+                return $"+FULLRESYNC {_config.masterReplId} {_config.masterReplOffset}\r\n";
+            }
+            else
+            {
+                return "Options not supported";
+            }
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e.Message);
+            return "Options not supported";
+        }
+    }
+
     public string ReplConf(string[] command, IPEndPoint remoteIpEndPoint)
     {
 
@@ -92,9 +131,6 @@ public class CommandHandler
             case "listening-port":
                 try
                 {
-                    //Console.WriteLine("**************************************************************************************");
-                    //Console.WriteLine("ClienPort " + clientPort);
-                    //Console.WriteLine("listening port " + command[2]);
                     Slave s = new Slave(int.Parse(command[2]), clientIpAddress);
                     _infra.clients.Add(s);
                     return _parser.RespBulkString("OK");
@@ -113,11 +149,6 @@ public class CommandHandler
                     {
                         _infra.clients[idx].capabilities.Add(command[i+1]);
                     }
-                }
-                Console.WriteLine("**************************************************************************************");
-                for (int i = 0; i < _infra.clients[0].capabilities.Count; i++)
-                {
-                    Console.WriteLine(_infra.clients[0].capabilities[i]);
                 }
                 
                 return _parser.RespBulkString("OK");
