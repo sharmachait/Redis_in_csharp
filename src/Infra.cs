@@ -48,9 +48,6 @@ public class Client
 
     public async Task SendAsync(string response)
     {
-        
-        foreach (byte b in Encoding.UTF8.GetBytes(response))
-            Console.Write(b);
-        await this.stream.WriteAsync(Encoding.UTF8.GetBytes(response));
+        this.stream.Write(Encoding.UTF8.GetBytes(response));
     }
 }
