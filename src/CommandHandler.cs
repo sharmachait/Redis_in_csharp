@@ -1,5 +1,6 @@
 ﻿using codecrafters_redis.src;
 using System.Net;
+using System.Text;
 
 namespace codecrafters_redis;
 
@@ -126,9 +127,13 @@ public class CommandHandler
                 await client.SendAsync(
                     $"+FULLRESYNC {_config.masterReplId} {_config.masterReplOffset}\r\n"
                 );
-                string rdbFileBase64 = "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==";
+                string emptyRdbFileBase64 =
+            "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==";
+                byte[] rdbFile = System.Convert.FromBase64String(emptyRdbFileBase64);
+                string response = $"${rdbFile.Length}\r\n{emptyRdbFileBase64}";
                 
-                return _parser.RespRdbFile(rdbFileBase64);
+
+                return response;
             }
             else
             {
