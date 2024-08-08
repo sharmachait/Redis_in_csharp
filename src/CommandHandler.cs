@@ -138,7 +138,9 @@ public class CommandHandler
                         .ToArray();
                 //client.stream.Write(rdbResynchronizationFileMsg);
                 Console.WriteLine("rdbResynchronizationFileMsg!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                Console.WriteLine(rdbResynchronizationFileMsg);
+                foreach( byte b in rdbResynchronizationFileMsg)
+                    Console.Write(b);
+                Console.WriteLine();
 
                 return Encoding.ASCII.GetString(rdbResynchronizationFileMsg);
             }
