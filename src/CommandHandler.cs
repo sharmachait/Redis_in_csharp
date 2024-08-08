@@ -127,18 +127,17 @@ public class CommandHandler
                 await client.SendAsync(
                     $"+FULLRESYNC {_config.masterReplId} {_config.masterReplOffset}\r\n"
                 );
-                string emptyRdbFileBase64 =
-            "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==";
-                byte[] rdbFile = System.Convert.FromBase64String(emptyRdbFileBase64);
-                
-                string response = $"${120}\r\n{emptyRdbFileBase64}";
-                Console.WriteLine("************************************************************************************");
-                Console.WriteLine("response: " + response);
-                await client.SendAsync(
-                    response
-                );
 
-                return "";
+                string emptyRdbFileBase64 =
+           "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==";
+                byte[] rdbFile = System.Convert.FromBase64String(emptyRdbFileBase64);
+                byte[] rdbResynchronizationFileMsg =
+                    Encoding.ASCII.GetBytes($"${rdbFile.Length}\r\n")
+                        .Concat(rdbFile)
+                        .ToArray();
+                client.stream.Write(rdbResynchronizationFileMsg);
+
+                return "response";
             }
             else
             {
