@@ -52,9 +52,10 @@ public class RespParser
 
         return string.Join("\r\n",res)+"\r\n";
     }
-    public string RespRdbFile(byte[] bytes)
+    public string RespRdbFile(string content)
     {
-        string res = $"{bytes.Length}\r\n{bytes.ToString()}";
+        byte[] bytes = Convert.FromBase64String(content);
+        string res = $"${bytes.Length}\r\n{content}";
         return res;
     }
 }

@@ -127,8 +127,8 @@ public class CommandHandler
                     $"+FULLRESYNC {_config.masterReplId} {_config.masterReplOffset}\r\n"
                 );
                 string rdbFileBase64 = "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==";
-                byte[] bytes = Convert.FromBase64String(rdbFileBase64);
-                return _parser.RespRdbFile(bytes);
+                
+                return _parser.RespRdbFile(rdbFileBase64);
             }
             else
             {
