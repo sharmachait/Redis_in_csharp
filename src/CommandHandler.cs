@@ -1,4 +1,5 @@
 ﻿using codecrafters_redis.src;
+using System.Collections;
 using System.Net;
 using System.Text;
 
@@ -135,9 +136,9 @@ public class CommandHandler
                     Encoding.ASCII.GetBytes($"${rdbFile.Length}\r\n")
                         .Concat(rdbFile)
                         .ToArray();
-                client.stream.Write(rdbResynchronizationFileMsg);
+                //client.stream.Write(rdbResynchronizationFileMsg);
 
-                return "";
+                return Encoding.UTF8.GetString(rdbResynchronizationFileMsg);
             }
             else
             {
