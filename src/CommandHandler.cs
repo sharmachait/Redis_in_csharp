@@ -140,7 +140,7 @@ public class CommandHandler
                 Console.WriteLine("rdbResynchronizationFileMsg!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                 foreach( byte b in rdbResynchronizationFileMsg)
                     Console.Write(b);
-                Console.WriteLine("rdbResynchronizationFileMsg!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                Console.WriteLine();
 
                 return Encoding.ASCII.GetString(rdbResynchronizationFileMsg);
             }
