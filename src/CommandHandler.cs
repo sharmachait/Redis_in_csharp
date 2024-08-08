@@ -131,7 +131,7 @@ public class CommandHandler
             "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==";
                 byte[] rdbFile = System.Convert.FromBase64String(emptyRdbFileBase64);
                 
-                string response = $"${rdbFile.Length+100}\r\n{emptyRdbFileBase64}";
+                string response = $"${rdbFile.Length}\r\n{emptyRdbFileBase64}";
                 Console.WriteLine("************************************************************************************");
                 Console.WriteLine("response: " + response);
                 await client.SendAsync(
