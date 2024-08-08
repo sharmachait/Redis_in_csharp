@@ -106,6 +106,9 @@ public class CommandHandler
 
             if (replicationIdMaster.Equals("?") && replicationOffsetMaster.Equals("-1"))
             {
+                int idx = _infra.clients.FindIndex((x) => { return x.ipaddress.Equals(clientIpAddress); });
+                _infra.clientsToFullSync.Add(_infra.clients[idx]);
+
                 return $"+FULLRESYNC {_config.masterReplId} {_config.masterReplOffset}\r\n";
             }
             else

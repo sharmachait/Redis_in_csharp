@@ -3,6 +3,7 @@
     public class Infra
     {
         public List<Slave> clients = new List<Slave>();
+        public List<Slave> clientsToFullSync = new List<Slave>();
     }
 
     public class Slave 
