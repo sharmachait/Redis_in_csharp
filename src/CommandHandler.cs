@@ -138,7 +138,7 @@ public class CommandHandler
                         .ToArray();
                 //client.stream.Write(rdbResynchronizationFileMsg);
 
-                return Encoding.UTF8.GetString(rdbResynchronizationFileMsg);
+                return Encoding.ASCII.GetString(rdbResynchronizationFileMsg);
             }
             else
             {
