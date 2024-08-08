@@ -48,6 +48,6 @@ public class Client
 
     public async Task SendAsync(string response)
     {
-        this.stream.Write(Encoding.ASCII.GetBytes(response));
+        this.stream.Write(Encoding.UTF8.GetBytes(response));
     }
 }

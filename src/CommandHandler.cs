@@ -123,7 +123,7 @@ public class CommandHandler
 
             if (replicationIdMaster.Equals("?") && replicationOffsetMaster.Equals("-1"))
             {
-                int idx = _infra.slaves.FindIndex((x) => { return x.ipaddress.Equals(clientIpAddress); });
+                //int idx = _infra.slaves.FindIndex((x) => { return x.ipaddress.Equals(clientIpAddress); });
 
                 await client.SendAsync(
                     $"+FULLRESYNC {_config.masterReplId} {_config.masterReplOffset}\r\n"
@@ -131,15 +131,17 @@ public class CommandHandler
 
                 string emptyRdbFileBase64 =
            "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==";
+                
                 byte[] rdbFile = System.Convert.FromBase64String(emptyRdbFileBase64);
+                
                 byte[] rdbResynchronizationFileMsg =
                     Encoding.ASCII.GetBytes($"${rdbFile.Length}\r\n")
                         .Concat(rdbFile)
                         .ToArray();
-                //client.stream.Write(rdbResynchronizationFileMsg);
-                Console.WriteLine();
+                
+                client.stream.Write(rdbResynchronizationFileMsg);
 
-                return Encoding.ASCII.GetString(rdbResynchronizationFileMsg);
+                return "";
             }
             else
             {
