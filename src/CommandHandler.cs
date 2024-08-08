@@ -137,7 +137,7 @@ public class CommandHandler
                         .ToArray();
                 client.stream.Write(rdbResynchronizationFileMsg);
 
-                return "response";
+                return "";
             }
             else
             {
