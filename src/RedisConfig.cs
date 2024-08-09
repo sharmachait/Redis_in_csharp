@@ -1,4 +1,5 @@
 ﻿namespace codecrafters_redis;
+
 public class RedisConfig
 {
     public string role; 
@@ -21,22 +22,20 @@ public class RedisConfig
 
     public RedisConfig(int port)
     {
-        
-        this.role = "master";
+        role = "master";
         this.port = port;
-        this.masterHost = ".";
-        this.masterPort = int.MinValue;
+        masterHost = ".";
+        masterPort = int.MinValue;
         masterReplId = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N").Substring(0, 8);
         masterReplOffset = 0;
     }
 
     public RedisConfig()
     {
-        
-        this.role = "master";
-        this.port = 6379;
-        this.masterHost = ".";
-        this.masterPort = int.MinValue;
+        role = "master";
+        port = 6379;
+        masterHost = ".";
+        masterPort = int.MinValue;
         masterReplId = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N").Substring(0, 8);
         masterReplOffset = 0;
     }

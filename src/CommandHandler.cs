@@ -11,6 +11,7 @@ public class CommandHandler
     private readonly Store _store;
     private readonly RedisConfig _config;
     private readonly Infra _infra;
+    private int slaveId=0;
 
     public CommandHandler(Store store, RespParser parser, RedisConfig config, Infra infra)
     {
@@ -24,9 +25,12 @@ public class CommandHandler
 
 
     public async Task<string> Handle(string[] command, Client client) {
+
         string cmd = command[0];
+
         DateTime currTime = DateTime.Now;
         string res = "";
+
         switch (cmd)
         {
             case "ping":
@@ -50,7 +54,7 @@ public class CommandHandler
                 break;
 
             case "replconf":
-                res = ReplConf(command, client.remoteIpEndPoint);
+                res = ReplConf(command, client);
                 break;
             case "psync":
                 res = await Psync(command, client);
@@ -59,6 +63,11 @@ public class CommandHandler
                 res = "+No Response\r\n";
                 break;
         }
+        if (res.Equals(""))
+        {
+            // dont write to client
+        }
+        // write to client res
         return res;
     }
 
@@ -84,7 +93,19 @@ public class CommandHandler
                 
         }
     }
+    public string Replication()
+    {
+        string role = $"role:{_config.role}";
+        string masterReplid = $"master_replid:{_config.masterReplId}";
+        string masterReplOffset = $"master_repl_offset:{_config.masterReplOffset}";
 
+        string[] info = [role, masterReplid, masterReplOffset];
+
+        string replicationData = string.Join("\r\n", info);
+
+        Console.WriteLine(replicationData);
+        return _parser.RespBulkString(replicationData);
+    }
 
 
 
@@ -123,23 +144,20 @@ public class CommandHandler
 
             if (replicationIdMaster.Equals("?") && replicationOffsetMaster.Equals("-1"))
             {
-                //int idx = _infra.slaves.FindIndex((x) => { return x.ipaddress.Equals(clientIpAddress); });
-
-                await client.SendAsync(
-                    $"+FULLRESYNC {_config.masterReplId} {_config.masterReplOffset}\r\n"
-                );
-
                 string emptyRdbFileBase64 =
            "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==";
                 
-                byte[] rdbFile = System.Convert.FromBase64String(emptyRdbFileBase64);
+                byte[] rdbFile = Convert.FromBase64String(emptyRdbFileBase64);
                 
                 byte[] rdbResynchronizationFileMsg =
                     Encoding.ASCII.GetBytes($"${rdbFile.Length}\r\n")
                         .Concat(rdbFile)
                         .ToArray();
-                
-                client.stream.Write(rdbResynchronizationFileMsg);
+
+                client.Send(
+                    $"+FULLRESYNC {_config.masterReplId} {_config.masterReplOffset}\r\n", 
+                    rdbResynchronizationFileMsg
+                );
 
                 return "";
             }
@@ -159,18 +177,19 @@ public class CommandHandler
 
 
 
-    public string ReplConf(string[] command, IPEndPoint remoteIpEndPoint)
+    public string ReplConf(string[] command, Client client)
     {
-        string clientIpAddress = remoteIpEndPoint.Address.ToString();
-        int clientPort = remoteIpEndPoint.Port;
+        string clientIpAddress = client.remoteIpEndPoint.Address.ToString();
+        int clientPort = client.remoteIpEndPoint.Port;
 
         switch (command[1])
         {
             case "listening-port":
                 try
                 {
-                    Slave s = new Slave(int.Parse(command[2]), clientIpAddress);
+                    Slave s = new Slave(++slaveId,client);
                     _infra.slaves.Add(s);
+
                     return _parser.RespBulkString("OK");
                 }
                 catch (Exception e)
@@ -181,7 +200,7 @@ public class CommandHandler
             case "capa":
                 try
                 {
-                    int idx = _infra.slaves.FindIndex((x) => { return x.ipaddress.Equals(clientIpAddress); });
+                    int idx = _infra.slaves.FindIndex((x) => { return x.connection.ipAddress.Equals(clientIpAddress); });
                     for (int i = 0; i < command.Length; i++)
                     {
                         if (command[i].Equals("capa"))
@@ -206,17 +225,5 @@ public class CommandHandler
 
 
 
-    public string Replication()
-    {
-        string role = $"role:{_config.role}";
-        string masterReplid = $"master_replid:{_config.masterReplId}";
-        string masterReplOffset = $"master_repl_offset:{_config.masterReplOffset}";
 
-        string[] info = [role, masterReplid, masterReplOffset];
-
-        string replicationData = string.Join("\r\n", info);
-        
-        Console.WriteLine(replicationData);
-        return _parser.RespBulkString(replicationData);
-    }
 }

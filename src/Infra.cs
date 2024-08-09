@@ -1,8 +1,6 @@
 ﻿using System.Net.Sockets;
 using System.Net;
-using System.Reflection.Metadata;
 using System.Text;
-using System.IO;
 
 namespace codecrafters_redis.src;
 
@@ -10,44 +8,53 @@ public class Infra
 {
     public List<Slave> slaves =  new List<Slave>();
     public List<Client> clients = new List<Client>();
-
-
 }
 
-public class Slave
-{
-    public int port;
-    public string ipaddress;
-    public List<string> capabilities;
-    public Slave(int port, string ipaddress)
-    {
-        this.port = port;
-        this.ipaddress = ipaddress;
-        capabilities = new List<string>();
-    }
-}
 
-public class Client
+public class BaseClient
 {
     public TcpClient socket;
     public IPEndPoint remoteIpEndPoint;
     public NetworkStream stream;
-    string clientIpAddress;
-    int clientPort;
-    int id;
+    public int port;
+    public string ipAddress;
+    public int id;
 
+    public void Send(string response)
+    {
+        stream.Write(Encoding.UTF8.GetBytes(response));
+    }
+
+    public void Send(string response, byte[] bytes)
+    {
+        stream.Write(Encoding.UTF8.GetBytes(response));
+
+        stream.Write(bytes);
+    }
+}
+
+public class Client: BaseClient
+{
     public Client(TcpClient socket, IPEndPoint ip, NetworkStream stream, int id)
     {
         this.socket = socket;
-        remoteIpEndPoint = ip;
         this.stream = stream;
-        clientIpAddress = remoteIpEndPoint.Address.ToString();
         this.id = id;
-        clientPort = remoteIpEndPoint.Port;
+        remoteIpEndPoint = ip;
+        ipAddress = remoteIpEndPoint.Address.ToString();
+        port = remoteIpEndPoint.Port;
     }
+}
 
-    public async Task SendAsync(string response)
+public class Slave
+{
+    public List<string> capabilities;
+    public Client connection;
+    public int id;
+    public Slave(int id, Client client)
     {
-        this.stream.Write(Encoding.UTF8.GetBytes(response));
+        this.id = id;
+        capabilities = new List<string>();
+        connection = client;
     }
 }

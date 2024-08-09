@@ -8,7 +8,7 @@ public class RespParser
         
     }
 
-    public string[] MakeCommand(byte[] command)
+    public string[] Deserialize(byte[] command)
     {
         string _data = Encoding.UTF8.GetString(command);
         string[] parts = _data.Split("\r\n");

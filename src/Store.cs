@@ -19,7 +19,7 @@ public class Store
             {
                 DateTime expiry = DateTime.MaxValue;
                 Value val = new Value(command[2], currTime, expiry);
-                this.map[command[1]] = val;
+                map[command[1]] = val;
             }
             else if (pxFlag >-1)// && command.Length == 5 && command[3].Equals("px")
             {
@@ -27,7 +27,7 @@ public class Store
 
                 DateTime expiry = currTime.AddMilliseconds(delta);
                 Value val = new Value(command[2], currTime, expiry);
-                this.map[command[1]] = val;
+                map[command[1]] = val;
             }
             return "+OK\r\n";
         }
@@ -41,7 +41,7 @@ public class Store
     {
         try
         {
-            Value val = this.map[command[1]];
+            Value val = map[command[1]];
 
             if (currTime <= val.expiry)
             {
@@ -49,7 +49,7 @@ public class Store
             }
             else
             {
-                this.map.Remove(command[1]);
+                map.Remove(command[1]);
                 return $"$-1\r\n";
             }
         }

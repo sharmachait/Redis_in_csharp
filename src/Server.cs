@@ -21,6 +21,7 @@ class Program
             if (replicaFlag > -1) 
             {
                 string masterHost = args[replicaFlag + 1].Split(' ')[0];
+
                 int masterPort = int.Parse(args[replicaFlag + 1].Split(' ')[1]);
 
                 config = new RedisConfig("slave", port, masterPort, masterHost);
