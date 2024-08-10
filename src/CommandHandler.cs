@@ -24,7 +24,7 @@ public class CommandHandler
 
 
 
-    public async Task<string> Handle(string[] command, Client client, byte[] buffer) {
+    public async Task<string> Handle(string[] command, Client client) {
 
         string cmd = command[0];
 
@@ -47,7 +47,7 @@ public class CommandHandler
 
             case "set":
                 res = Set(client.remoteIpEndPoint, command,currTime);
-                _ = Task.Run(() => sendCommandToSlaves(_infra.slaves,buffer));
+                _ = Task.Run(() => sendCommandToSlaves(_infra.slaves, command));
                 break;
 
             case "info":
@@ -72,11 +72,13 @@ public class CommandHandler
         return res;
     }
 
-    public void sendCommandToSlaves(List<Slave> slaves, byte[] buffer)
+    public void sendCommandToSlaves(List<Slave> slaves, string[] command)
     {
         foreach(Slave slave in slaves)
         {
-            slave.connection.Send(buffer);
+            string commandRespString = _parser.RespArray(command);
+            Console.WriteLine(commandRespString);
+            slave.connection.Send(commandRespString);
         }
     }
 
