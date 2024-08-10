@@ -59,6 +59,11 @@ class Program
                 Console.WriteLine("Connection not established with master, please retry");
                 return;
             }
+            else
+            {
+                //start receiving from master on different thread
+                _ = Task.Run(() => app.StartMasterPropogation(ConnectionWithMaster));
+            }
         }
 
         app.Start();

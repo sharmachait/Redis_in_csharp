@@ -56,6 +56,25 @@ class TcpServer
         }
     }
 
+    public async Task StartMasterPropogation(TcpClient ConnectionWithMaster)
+    {
+        while (ConnectionWithMaster.Connected)
+        {
+            IPEndPoint? remoteIpEndPoint = ConnectionWithMaster.Client.RemoteEndPoint as IPEndPoint;
+            if (remoteIpEndPoint == null)
+                return;
+
+            NetworkStream stream = ConnectionWithMaster.GetStream();
+
+            byte[] buffer = new byte[ConnectionWithMaster.ReceiveBufferSize];
+
+            await stream.ReadAsync(buffer, 0, buffer.Length);
+
+            string[] command = _parser.Deserialize(buffer);
+
+            string response = await _handler.HandleMasterCommands(command);
+        }
+    }
 
     public async Task HandleClientAsync(Client client)
     {
@@ -70,7 +89,10 @@ class TcpServer
 
             string response = await _handler.Handle(command, client);
 
-            if (client.ipAddress.Equals(_config.masterHost) && client.port == _config.masterPort) 
+            if (
+                    client.ipAddress.Equals(_config.masterHost) 
+                    && client.port == _config.masterPort
+                ) 
             {
                 //dont send to client when client writting to the instance is the master
                 return;
@@ -137,6 +159,7 @@ class TcpServer
             return null;
 
         //do multi thread to listen from master
+        Console.WriteLine("ready to process commands from master");
         return client;
     }
 }

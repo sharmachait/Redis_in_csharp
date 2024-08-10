@@ -21,7 +21,28 @@ public class CommandHandler
         _config = config;
     }
 
+    public async Task<string> HandleMasterCommands(string[] command)
+    {
 
+        string cmd = command[0];
+
+        DateTime currTime = DateTime.Now;
+        string res = "";
+
+        switch (cmd)
+        {
+            case "set":
+                res = SetFromMaster(command, currTime);
+                _ = Task.Run(() => sendCommandToSlaves(_infra.slaves, command));
+                break;
+
+            default:
+                res = "+No Response\r\n";
+                break;
+        }
+
+        return res;
+    }
 
 
     public async Task<string> Handle(string[] command, Client client) {
@@ -70,6 +91,7 @@ public class CommandHandler
 
     public void sendCommandToSlaves(List<Slave> slaves, string[] command)
     {
+        // add support for the use of eof and psync2 capabilities
         foreach(Slave slave in slaves)
         {
             string commandRespString = _parser.RespArray(command);
@@ -137,6 +159,10 @@ public class CommandHandler
         return res;
     }
 
+    public string SetFromMaster(string[] command, DateTime currTime)
+    {
+        return _store.Set(command, currTime);
+    }
 
 
 
@@ -188,6 +214,7 @@ public class CommandHandler
 
     public async Task<string> Psync(string[] command, Client client)
     {
+        // add support for the use of eof and psync2 capabilities
         try
         {
             string clientIpAddress = client.remoteIpEndPoint.Address.ToString();
