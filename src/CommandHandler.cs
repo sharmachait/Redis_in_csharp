@@ -26,7 +26,11 @@ public class CommandHandler
 
         string cmd = command[0];
         Console.WriteLine("**********************************************************************************");
-        Console.WriteLine("Received command from master: "+cmd[0]);
+        Console.WriteLine("Received command from master: ");
+        foreach(string c in command)
+        {
+            Console.Write(c + " ");
+        }
         Console.WriteLine("**********************************************************************************");
         DateTime currTime = DateTime.Now;
         string res = "";
