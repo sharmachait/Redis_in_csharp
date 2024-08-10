@@ -68,7 +68,7 @@ class TcpServer
 
             byte[] buffer = new byte[ConnectionWithMaster.ReceiveBufferSize];
 
-            await stream.ReadAsync(buffer, 0, buffer.Length);
+            stream.Read(buffer, 0, buffer.Length);
 
             string[] command = _parser.Deserialize(buffer);
 
