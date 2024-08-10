@@ -69,7 +69,12 @@ class TcpServer
             string[] command = _parser.Deserialize(buffer);
 
             string response = await _handler.Handle(command, client);
-            
+
+            if (client.ipAddress.Equals(_config.masterHost) && client.port == _config.masterPort) 
+            {
+                //dont send to client when client writting to the instance is the master
+                return;
+            }
             client.Send(response);
         }
         

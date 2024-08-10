@@ -47,7 +47,7 @@ public class CommandHandler
 
             case "set":
                 res = Set(client.remoteIpEndPoint, command,currTime);
-                _ = Task.Run(() => sendCommandToSlaves(_infra.slaves, command));
+                
                 break;
 
             case "info":
@@ -64,11 +64,7 @@ public class CommandHandler
                 res = "+No Response\r\n";
                 break;
         }
-        if (res.Equals(""))
-        {
-            // dont write to client
-        }
-        // write to client res
+
         return res;
     }
 
