@@ -68,7 +68,7 @@ class TcpServer
 
             string[] command = _parser.Deserialize(buffer);
 
-            string response = await _handler.Handle(command, client, buffer);
+            string response = await _handler.Handle(command, client);
             
             client.Send(response);
         }
