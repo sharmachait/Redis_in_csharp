@@ -24,7 +24,7 @@ public class CommandHandler
 
 
 
-    public async Task<string> Handle(string[] command, Client client) {
+    public async Task<string> Handle(string[] command, Client client, byte[] buffer) {
 
         string cmd = command[0];
 
@@ -47,6 +47,7 @@ public class CommandHandler
 
             case "set":
                 res = Set(client.remoteIpEndPoint, command,currTime);
+                _ = Task.Run(() => sendCommandToSlaves(_infra.slaves,buffer));
                 break;
 
             case "info":
@@ -71,6 +72,13 @@ public class CommandHandler
         return res;
     }
 
+    public void sendCommandToSlaves(List<Slave> slaves, byte[] buffer)
+    {
+        foreach(Slave slave in slaves)
+        {
+            slave.connection.Send(buffer);
+        }
+    }
 
 
 
@@ -126,9 +134,57 @@ public class CommandHandler
                 return _parser.RespBulkString("READONLY You can't write against a read only replica.");
             }
         }
-        return _store.Set(command, currTime);
+        var res = _store.Set(command, currTime);
+
+        return res;
     }
 
+
+
+
+    public string ReplConf(string[] command, Client client)
+    {
+        string clientIpAddress = client.remoteIpEndPoint.Address.ToString();
+        int clientPort = client.remoteIpEndPoint.Port;
+
+        switch (command[1])
+        {
+            case "listening-port":
+                try
+                {
+                    Slave s = new Slave(++slaveId, client);
+                    _infra.slaves.Add(s);
+
+                    return _parser.RespBulkString("OK");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    return _parser.RespBulkString("NOTOK");
+                }
+            case "capa":
+                try
+                {
+                    int idx = _infra.slaves.FindIndex((x) => { return x.connection.ipAddress.Equals(clientIpAddress); });
+                    for (int i = 0; i < command.Length; i++)
+                    {
+                        if (command[i].Equals("capa"))
+                        {
+                            _infra.slaves[idx].capabilities.Add(command[i + 1]);
+                        }
+                    }
+
+                    return _parser.RespBulkString("OK");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    return _parser.RespBulkString("NOTOK");
+                }
+
+        }
+        return _parser.RespBulkString("OK");
+    }
 
 
 
@@ -172,58 +228,4 @@ public class CommandHandler
             return "Options not supported";
         }
     }
-
-
-
-
-
-    public string ReplConf(string[] command, Client client)
-    {
-        string clientIpAddress = client.remoteIpEndPoint.Address.ToString();
-        int clientPort = client.remoteIpEndPoint.Port;
-
-        switch (command[1])
-        {
-            case "listening-port":
-                try
-                {
-                    Slave s = new Slave(++slaveId,client);
-                    _infra.slaves.Add(s);
-
-                    return _parser.RespBulkString("OK");
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                    return _parser.RespBulkString("NOTOK");
-                }
-            case "capa":
-                try
-                {
-                    int idx = _infra.slaves.FindIndex((x) => { return x.connection.ipAddress.Equals(clientIpAddress); });
-                    for (int i = 0; i < command.Length; i++)
-                    {
-                        if (command[i].Equals("capa"))
-                        {
-                            _infra.slaves[idx].capabilities.Add(command[i + 1]);
-                        }
-                    }
-
-                    return _parser.RespBulkString("OK");
-                }
-                catch(Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                    return _parser.RespBulkString("NOTOK");
-                }
-                
-        }
-        return _parser.RespBulkString("OK");
-    }
-
-
-
-
-
-
 }

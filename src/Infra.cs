@@ -24,6 +24,10 @@ public class BaseClient
     {
         stream.Write(Encoding.UTF8.GetBytes(response));
     }
+    public void Send(byte[] bytes)
+    {
+        stream.Write(bytes);
+    }
 
     public void Send(string response, byte[] bytes)
     {

@@ -68,7 +68,7 @@ class TcpServer
 
             string[] command = _parser.Deserialize(buffer);
 
-            string response = await _handler.Handle(command, client);
+            string response = await _handler.Handle(command, client, buffer);
             
             client.Send(response);
         }
@@ -131,7 +131,7 @@ class TcpServer
         if (response == null || !"+FULLRESYNC".Equals(response.Substring(0, response.IndexOf(" "))))
             return null;
 
-
+        //do multi thread to listen from master
         return client;
     }
 }
