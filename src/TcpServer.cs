@@ -82,7 +82,8 @@ class TcpServer
             await client.stream.ReadAsync(buffer);
 
             string[] command = _parser.Deserialize(buffer);
-            foreach(string c in command)
+            Console.WriteLine("command parseed: ");
+            foreach (string c in command)
             {
                 Console.Write(c + " ");
             }
