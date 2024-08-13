@@ -60,10 +60,6 @@ class TcpServer
     {
         while (ConnectionWithMaster.Connected)
         {
-            IPEndPoint? remoteIpEndPoint = ConnectionWithMaster.Client.RemoteEndPoint as IPEndPoint;
-            if (remoteIpEndPoint == null)
-                return;
-
             NetworkStream stream = ConnectionWithMaster.GetStream();
 
             byte[] buffer = new byte[ConnectionWithMaster.ReceiveBufferSize];
@@ -83,9 +79,13 @@ class TcpServer
         {
             byte[] buffer = new byte[client.socket.ReceiveBufferSize];
 
-            await client.stream.ReadAsync(buffer, 0, buffer.Length);
+            await client.stream.ReadAsync(buffer);
 
             string[] command = _parser.Deserialize(buffer);
+            foreach(string c in command)
+            {
+                Console.Write(c + " ");
+            }
 
             string response = await _handler.Handle(command, client);
 
