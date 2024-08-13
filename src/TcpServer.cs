@@ -68,6 +68,12 @@ class TcpServer
 
             string[] command = _parser.Deserialize(buffer);
 
+            Console.WriteLine("command parseed: ");
+            foreach (string c in command)
+            {
+                Console.Write(c + " ");
+            }
+
             string response = await _handler.HandleMasterCommands(command);
         }
     }
