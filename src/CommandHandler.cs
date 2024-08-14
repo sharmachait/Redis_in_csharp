@@ -11,7 +11,7 @@ public class CommandHandler
     private readonly Store _store;
     private readonly RedisConfig _config;
     private readonly Infra _infra;
-    private int slaveId=0;
+    private int slaveId = 0;
 
     public CommandHandler(Store store, RespParser parser, RedisConfig config, Infra infra)
     {
@@ -27,7 +27,7 @@ public class CommandHandler
         string cmd = command[0];
         Console.WriteLine("**********************************************************************************");
         Console.WriteLine("Received command from master: ");
-        foreach(string c in command)
+        foreach (string c in command)
         {
             Console.Write(c + " ");
         }
@@ -51,7 +51,8 @@ public class CommandHandler
     }
 
 
-    public async Task<string> Handle(string[] command, Client client) {
+    public async Task<string> Handle(string[] command, Client client)
+    {
 
         string cmd = command[0];
 
@@ -63,17 +64,17 @@ public class CommandHandler
             case "ping":
                 res = "+PONG\r\n";
                 break;
-                
+
             case "echo":
                 res = $"+{command[1]}\r\n";
                 break;
-                
+
             case "get":
                 res = _store.Get(command, currTime);
                 break;
 
             case "set":
-                res = Set(client.remoteIpEndPoint, command,currTime);
+                res = Set(client.remoteIpEndPoint, command, currTime);
                 _ = Task.Run(() => sendCommandToSlaves(_infra.slaves, command));
                 break;
 
@@ -98,7 +99,7 @@ public class CommandHandler
     public void sendCommandToSlaves(List<Slave> slaves, string[] command)
     {
         // add support for the use of eof and psync2 capabilities
-        foreach(Slave slave in slaves)
+        foreach (Slave slave in slaves)
         {
             string commandRespString = _parser.RespArray(command);
             Console.WriteLine(commandRespString);
@@ -108,7 +109,7 @@ public class CommandHandler
 
 
 
-    
+
     public string Info(string[] command)
     {
         switch (command[1])
@@ -124,7 +125,7 @@ public class CommandHandler
                 }
             default:
                 return "Invalid options";
-                
+
         }
     }
     public string Replication()
@@ -185,12 +186,12 @@ public class CommandHandler
                     Slave s = new Slave(++slaveId, client);
                     _infra.slaves.Add(s);
 
-                    return _parser.RespBulkString("OK");
+                    return "+OK\r\n";
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
-                    return _parser.RespBulkString("NOTOK");
+                    return "+NOTOK\r\n";
                 }
             case "capa":
                 try
@@ -204,16 +205,16 @@ public class CommandHandler
                         }
                     }
 
-                    return _parser.RespBulkString("OK");
+                    return "+OK\r\n";
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
-                    return _parser.RespBulkString("NOTOK");
+                    return "+NOTOK\r\n";
                 }
 
         }
-        return _parser.RespBulkString("OK");
+        return "+OK\r\n";
     }
 
 
@@ -233,16 +234,16 @@ public class CommandHandler
             {
                 string emptyRdbFileBase64 =
            "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==";
-                
+
                 byte[] rdbFile = Convert.FromBase64String(emptyRdbFileBase64);
-                
+
                 byte[] rdbResynchronizationFileMsg =
                     Encoding.ASCII.GetBytes($"${rdbFile.Length}\r\n")
                         .Concat(rdbFile)
                         .ToArray();
 
                 client.Send(
-                    $"+FULLRESYNC {_config.masterReplId} {_config.masterReplOffset}\r\n", 
+                    $"+FULLRESYNC {_config.masterReplId} {_config.masterReplOffset}\r\n",
                     rdbResynchronizationFileMsg
                 );
 
@@ -253,7 +254,7 @@ public class CommandHandler
                 return "Options not supported";
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Console.WriteLine(e.Message);
             return "Options not supported";
