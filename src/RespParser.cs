@@ -27,7 +27,15 @@ public class RespParser
         string[] parts = _data.Split("\r\n");
         if (parts[0][0]=='*')
         {
-            return ParseArray(parts);
+            string[] res  = ParseArray(parts);
+            Console.WriteLine("****************************************************************************************************");
+            Console.WriteLine("parsed with out split");
+
+            foreach (string c in res)
+            {   
+                Console.WriteLine(c);
+            }
+            return res;
         }
         return new string[] { "No","command"};
     }
