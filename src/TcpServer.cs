@@ -67,8 +67,9 @@ class TcpServer
             stream.Read(buffer, 0, buffer.Length);
 
             string[] command = _parser.Deserialize(buffer);
-
+            Console.WriteLine("****************************************************************************************************");
             Console.WriteLine("command from master: ");
+            Console.WriteLine("****************************************************************************************************");
             foreach (string c in command)
             {
                 Console.Write(c + " ");
