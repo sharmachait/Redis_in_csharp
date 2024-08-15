@@ -1,4 +1,4 @@
-﻿$client = New-Object System.Net.Sockets.TcpClient('localhost', 8000)
+﻿$client = New-Object System.Net.Sockets.TcpClient('localhost', 6379)
 $stream = $client.GetStream()
 $writer = New-Object System.IO.StreamWriter($stream)
 $writer.AutoFlush = $true

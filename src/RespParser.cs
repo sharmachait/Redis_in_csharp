@@ -11,6 +11,10 @@ public class RespParser
     public string[] Deserialize(byte[] command)
     {
         string _data = Encoding.UTF8.GetString(command);
+        Console.WriteLine("****************************************************************************************************");
+        Console.WriteLine("non parsed");
+        Console.WriteLine("****************************************************************************************************");
+        Console.WriteLine(_data);
         _data = _data.Substring(0, _data.IndexOf('\0'));
         string[] parts = _data.Split("\r\n");
         if (parts[0][0]=='*')

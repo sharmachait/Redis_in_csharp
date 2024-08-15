@@ -56,7 +56,7 @@ class TcpServer
         }
     }
 
-    public async Task StartMasterPropogation(TcpClient ConnectionWithMaster)
+    public async Task StartMasterPropagation(TcpClient ConnectionWithMaster)
     {
         while (ConnectionWithMaster.Connected)
         {
@@ -88,7 +88,7 @@ class TcpServer
             await client.stream.ReadAsync(buffer);
 
             string[] command = _parser.Deserialize(buffer);
-            Console.WriteLine("command parseed: ");
+            Console.WriteLine("command parsed from client: ");
             foreach (string c in command)
             {
                 Console.Write(c + " ");

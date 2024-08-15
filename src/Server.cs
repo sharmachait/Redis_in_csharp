@@ -62,7 +62,7 @@ class Program
             else
             {
                 //start receiving from master on different thread
-                _ = Task.Run(async () => await app.StartMasterPropogation(ConnectionWithMaster));
+                _ = Task.Run(async () => await app.StartMasterPropagation(ConnectionWithMaster));
             }
         }
 
