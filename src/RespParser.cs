@@ -55,6 +55,7 @@ public class RespParser
         {
             Console.WriteLine(c);
         }
+        Console.WriteLine("****************************************************************************************************");
         return _command;
     }
 
