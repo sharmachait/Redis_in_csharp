@@ -70,6 +70,12 @@ class TcpServer
 
             foreach(string[] command in commands)
             {
+                Console.WriteLine("commands from master: ");
+                foreach (string c in command)
+                {
+                    Console.Write(c + " ");
+                }
+                Console.WriteLine();
                 string response = await _handler.HandleMasterCommands(command);
             }
         }
