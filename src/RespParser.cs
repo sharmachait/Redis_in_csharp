@@ -25,13 +25,7 @@ public class RespParser
 
 
         string[] parts = _data.Split("\r\n");
-        Console.WriteLine("****************************************************************************************************");
-        Console.WriteLine("parts with out split");
 
-        foreach (string c in parts)
-        {
-            Console.WriteLine(c);
-        }
 
 
         if (parts[0][0]=='*')
@@ -53,6 +47,13 @@ public class RespParser
         for (int i = 4; i < parts.Length; i+=2)
         {
             _command[idx++] = parts[i];
+        }
+        Console.WriteLine("****************************************************************************************************");
+        Console.WriteLine("parts with out split");
+
+        foreach (string c in _command)
+        {
+            Console.WriteLine(c);
         }
         return _command;
     }
