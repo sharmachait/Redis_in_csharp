@@ -12,6 +12,7 @@ public class RespParser
     {
         string _data = Encoding.UTF8.GetString(command);
         _data = _data.Substring(0, _data.IndexOf('\0'));
+
         Console.WriteLine("****************************************************************************************************");
         Console.WriteLine("split on *");
 
@@ -25,8 +26,6 @@ public class RespParser
 
 
         string[] parts = _data.Split("\r\n");
-        Console.WriteLine("parts[0]******************: " + parts[0]+" **********************");
-
 
         if (parts[0][0]=='*')
         {
@@ -41,6 +40,8 @@ public class RespParser
     {
         string len = parts[0].Substring(1);
         int length = int.Parse(len);
+        Console.WriteLine("length+++++++++++++++++++++++++++++++++++++++++++++++++");
+        Console.WriteLine(length);
         string[] _command = new string[length];
         _command[0] = parts[2].ToLower();
         int idx = 1;
@@ -48,14 +49,6 @@ public class RespParser
         {
             _command[idx++] = parts[i];
         }
-        Console.WriteLine("****************************************************************************************************");
-        Console.WriteLine("parts with out split");
-
-        foreach (string c in _command)
-        {
-            Console.WriteLine(c);
-        }
-        Console.WriteLine("****************************************************************************************************");
         return _command;
     }
 
