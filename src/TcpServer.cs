@@ -67,8 +67,9 @@ class TcpServer
             stream.Read(buffer, 0, buffer.Length);
 
             List<string[]> commands = _parser.Deserialize(buffer);
+            Console.WriteLine("commands from master: "+ commands.Count +" **************************************************************************");
 
-            foreach(string[] command in commands)
+            foreach (string[] command in commands)
             {
                 Console.WriteLine("commands from master: ");
                 foreach (string c in command)
