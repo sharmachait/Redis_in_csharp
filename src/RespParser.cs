@@ -25,7 +25,7 @@ public class RespParser
 
 
         string[] parts = _data.Split("\r\n");
-
+        Console.WriteLine("parts[0]******************: " + parts[0]+" **********************");
 
 
         if (parts[0][0]=='*')
