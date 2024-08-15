@@ -1,4 +1,4 @@
-﻿$client = New-Object System.Net.Sockets.TcpClient('localhost', 6379)
+﻿$client = New-Object System.Net.Sockets.TcpClient('localhost', 8000)
 $stream = $client.GetStream()
 $writer = New-Object System.IO.StreamWriter($stream)
 $writer.AutoFlush = $true
@@ -7,7 +7,8 @@ $writer.AutoFlush = $true
 $reader = New-Object System.IO.StreamReader($stream)
 
 # Send a command to the server (example: PING for Redis)
-$command = "*1`r`n`$4`r`nPING`r`n"
+$pingcommand = "*1`r`n`$4`r`nPING`r`n"
+$command = "*2`r`n$3`r`nGET`r`n$3`r`nfoo`r`n"
 $writer.Write($command)  # Use Write instead of WriteLine
 
 $response = $reader.ReadLine()
