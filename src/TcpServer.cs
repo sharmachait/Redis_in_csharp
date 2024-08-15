@@ -9,7 +9,7 @@ using System.Text;
 class TcpServer
 {
     private readonly TcpListener _server;
-    private readonly RespParser _parser ;
+    private readonly RespParser _parser;
     private readonly CommandHandler _handler;
     private readonly RedisConfig _config;
     private readonly Infra _infra;
@@ -36,7 +36,7 @@ class TcpServer
     {
         _server.Start();
 
-        Console.WriteLine("Server started..." );
+        Console.WriteLine("Server started...");
 
         while (true)
         {
@@ -48,7 +48,7 @@ class TcpServer
 
             NetworkStream stream = socket.GetStream();
 
-            Client client = new Client(socket, remoteIpEndPoint,stream,id);
+            Client client = new Client(socket, remoteIpEndPoint, stream, id);
 
             _infra.clients.Add(client);
 
@@ -67,7 +67,7 @@ class TcpServer
             stream.Read(buffer, 0, buffer.Length);
 
             List<string[]> commands = _parser.Deserialize(buffer);
-            Console.WriteLine("commands from master: "+ commands.Count +" **************************************************************************");
+            Console.WriteLine("commands from master: " + commands.Count + " **************************************************************************");
 
             foreach (string[] command in commands)
             {
@@ -84,7 +84,7 @@ class TcpServer
 
     public async Task HandleClientAsync(Client client)
     {
-        
+
         while (client.socket.Connected)
         {
             byte[] buffer = new byte[client.socket.ReceiveBufferSize];
@@ -93,7 +93,7 @@ class TcpServer
 
             List<string[]> commands = _parser.Deserialize(buffer);
 
-            foreach(string[] command in commands)
+            foreach (string[] command in commands)
             {
                 string response = await _handler.Handle(command, client);
                 if (
@@ -107,7 +107,7 @@ class TcpServer
                 client.Send(response);
             }
         }
-        
+
     }
 
     //done by slave instace
@@ -138,6 +138,7 @@ class TcpServer
         stream.Write(Encoding.UTF8.GetBytes(_parser.RespArray(ReplconfPortCommand)));
 
         response = reader.ReadLine();
+        Console.WriteLine("replconf response" + " " + response + " ******************************************");
 
         if (!"+OK".Equals(response))
             return null;
@@ -150,6 +151,7 @@ class TcpServer
         stream.Write(Encoding.UTF8.GetBytes(_parser.RespArray(ReplconfCapaCommand)));
 
         response = reader.ReadLine();
+        Console.WriteLine("replconf response" + " " + response + " ******************************************");
 
         if (!"+OK".Equals(response))
             return null;
@@ -162,6 +164,7 @@ class TcpServer
         stream.Write(Encoding.UTF8.GetBytes(_parser.RespArray(PsyncCommand)));
 
         response = reader.ReadLine();
+        Console.WriteLine("psync response" + " " + response + " ******************************************");
 
         if (response == null || !"+FULLRESYNC".Equals(response.Substring(0, response.IndexOf(" "))))
             return null;

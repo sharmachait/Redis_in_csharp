@@ -18,12 +18,9 @@ public class RespParser
         List<string[]> res = new List<string[]>();
 
         foreach (string c in commands) {
-            string[] parts = _data.Split(c);
-            if (parts[0][0] == '*')
-            {
-                string[] commandArray = ParseArray(parts);
-                res.Add(commandArray);
-            }
+            string[] parts = c.Split("\r\n");
+            string[] commandArray = ParseArray(parts);
+            res.Add(commandArray);
         }
 
         if (res.Count == 0)
