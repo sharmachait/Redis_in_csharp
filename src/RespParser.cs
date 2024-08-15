@@ -8,40 +8,35 @@ public class RespParser
         
     }
 
-    public string[] Deserialize(byte[] command)
+    public List<string[]> Deserialize(byte[] command)
     {
         string _data = Encoding.UTF8.GetString(command);
         _data = _data.Substring(0, _data.IndexOf('\0'));
 
-        Console.WriteLine("****************************************************************************************************");
-        Console.WriteLine("split on *");
-
         string[] commands = _data.Split('*');
-        int i = 0;
-        foreach(string c in commands)
-        {
-            Console.WriteLine("command id"+i++);
-            Console.WriteLine(c);
+        
+        List<string[]> res = new List<string[]>();
+
+        foreach (string c in commands) {
+            string[] parts = _data.Split(c);
+            if (parts[0][0] == '*')
+            {
+                string[] commandArray = ParseArray(parts);
+                res.Add(commandArray);
+            }
         }
 
-
-        string[] parts = _data.Split("\r\n");
-
-        if (parts[0][0]=='*')
-        {
-            string[] res  = ParseArray(parts);
-            
-            return res;
-        }
-        return new string[] { "No","command"};
+        if (res.Count == 0)
+            res.Add(new string[] { "No", "command" });
+        
+        return res;
     }
 
     public string[] ParseArray(string[] parts)
     {
         string len = parts[0].Substring(1);
         int length = int.Parse(len);
-        Console.WriteLine("length+++++++++++++++++++++++++++++++++++++++++++++++++");
-        Console.WriteLine(length);
+        
         string[] _command = new string[length];
         _command[0] = parts[2].ToLower();
         int idx = 1;

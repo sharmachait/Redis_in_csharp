@@ -66,16 +66,12 @@ class TcpServer
 
             stream.Read(buffer, 0, buffer.Length);
 
-            string[] command = _parser.Deserialize(buffer);
-            Console.WriteLine("****************************************************************************************************");
-            Console.WriteLine("command from master: ");
-            Console.WriteLine("****************************************************************************************************");
-            foreach (string c in command)
-            {
-                Console.Write(c + " ");
-            }
+            List<string[]> commands = _parser.Deserialize(buffer);
 
-            string response = await _handler.HandleMasterCommands(command);
+            foreach(string[] command in commands)
+            {
+                string response = await _handler.HandleMasterCommands(command);
+            }
         }
     }
 
@@ -88,24 +84,21 @@ class TcpServer
 
             await client.stream.ReadAsync(buffer);
 
-            string[] command = _parser.Deserialize(buffer);
-            Console.WriteLine("command parsed from client: ");
-            foreach (string c in command)
+            List<string[]> commands = _parser.Deserialize(buffer);
+
+            foreach(string[] command in commands)
             {
-                Console.Write(c + " ");
-            }
-
-            string response = await _handler.Handle(command, client);
-
-            if (
-                    client.ipAddress.Equals(_config.masterHost) 
+                string response = await _handler.Handle(command, client);
+                if (
+                    client.ipAddress.Equals(_config.masterHost)
                     && client.port == _config.masterPort
-                ) 
-            {
-                //dont send to client when client writting to the instance is the master
-                return;
+                )
+                {
+                    //dont send to client when client writting to the instance is the master
+                    return;
+                }
+                client.Send(response);
             }
-            client.Send(response);
         }
         
     }
