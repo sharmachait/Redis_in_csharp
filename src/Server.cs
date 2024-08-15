@@ -48,7 +48,9 @@ class Program
 
         TcpServer app = serviceProvider.GetRequiredService<TcpServer>();
 
-        await app.StartAsync();
+        
+        _ = Task.Run(async () => await app.StartAsync());
+
         Console.WriteLine("######################################################## control reached here ########################################################");
         if (config.role.Equals("slave"))
         {
