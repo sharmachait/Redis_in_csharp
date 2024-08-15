@@ -11,14 +11,14 @@ class Program
     {
         int portFlag = args.ToList().IndexOf("--port");
         int replicaFlag = args.ToList().IndexOf("--replicaof");
-        
+
         RedisConfig config;
 
-        if (portFlag > -1) 
+        if (portFlag > -1)
         {
             int port = int.Parse(args[portFlag + 1]);
 
-            if (replicaFlag > -1) 
+            if (replicaFlag > -1)
             {
                 string masterHost = args[replicaFlag + 1].Split(' ')[0];
 
@@ -31,11 +31,11 @@ class Program
                 config = new RedisConfig(port);
             }
         }
-        else 
+        else
         {
             config = new RedisConfig();
         }
-        
+
 
         var serviceProvider = new ServiceCollection()
             .AddSingleton(config)
@@ -48,8 +48,8 @@ class Program
 
         TcpServer app = serviceProvider.GetRequiredService<TcpServer>();
 
-        _ = Task.Run(() => app.Start());
-
+        await app.StartAsync();
+        Console.WriteLine("######################################################## control reached here ########################################################")
         if (config.role.Equals("slave"))
         {
             TcpClient? ConnectionWithMaster = await app.InitiateSlaveryAsync(
@@ -67,7 +67,6 @@ class Program
             }
         }
 
-        //app.Start();
     }
 
 }

@@ -32,7 +32,7 @@ class TcpServer
     }
 
 
-    public void Start()
+    public async Task StartAsync()
     {
         _server.Start();
 
@@ -40,7 +40,7 @@ class TcpServer
 
         while (true)
         {
-            TcpClient socket = _server.AcceptTcpClient();
+            TcpClient socket = await _server.AcceptTcpClientAsync();
             id++;
             IPEndPoint? remoteIpEndPoint = socket.Client.RemoteEndPoint as IPEndPoint;
             if (remoteIpEndPoint == null)
