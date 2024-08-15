@@ -48,6 +48,7 @@ class Program
 
         TcpServer app = serviceProvider.GetRequiredService<TcpServer>();
 
+       _ = Task.Run(() => app.Start());
 
         if (config.role.Equals("slave"))
         {
@@ -65,8 +66,6 @@ class Program
                 _ = Task.Run(async () => await app.StartMasterPropagation(ConnectionWithMaster));
             }
         }
-
-        app.Start();
     }
 }
 
