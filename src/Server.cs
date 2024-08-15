@@ -48,7 +48,7 @@ class Program
 
         TcpServer app = serviceProvider.GetRequiredService<TcpServer>();
 
-       //_ = Task.Run(() => app.Start());
+        _ = Task.Run(() => app.Start());
 
         if (config.role.Equals("slave"))
         {
@@ -67,7 +67,8 @@ class Program
             }
         }
 
-        app.Start();
+        //app.Start();
     }
+
 }
 
