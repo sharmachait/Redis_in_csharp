@@ -49,7 +49,7 @@ class Program
         TcpServer app = serviceProvider.GetRequiredService<TcpServer>();
 
         await app.StartAsync();
-        Console.WriteLine("######################################################## control reached here ########################################################")
+        Console.WriteLine("######################################################## control reached here ########################################################");
         if (config.role.Equals("slave"))
         {
             TcpClient? ConnectionWithMaster = await app.InitiateSlaveryAsync(
