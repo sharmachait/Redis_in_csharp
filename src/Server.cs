@@ -72,11 +72,12 @@ class Program
         
         try
         {
-            _ = Task.Run(async ()=> await app.StartAsync());
             if (config.role == "slave")
             {
                 _ = Task.Run(async () => { await app.StartReplicaAsync(); });
             }
+            _ = Task.Run(async ()=> await app.StartAsync());
+            
         }
         finally
         {
