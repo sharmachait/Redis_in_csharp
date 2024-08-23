@@ -69,14 +69,14 @@ class Program
 
         TcpServer app = serviceProvider.GetRequiredService<TcpServer>();
 
-        if (config.role == "slave")
-        {
-            _ = Task.Run(async () => { await app.StartReplicaAsync(); });
-        }
-        ///////////////////////----------------------------------------aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        
         try
         {
-            await app.StartAsync();
+            _ = Task.Run(async ()=> await app.StartAsync());
+            if (config.role == "slave")
+            {
+                _ = Task.Run(async () => { await app.StartReplicaAsync(); });
+            }
         }
         finally
         {
