@@ -77,13 +77,6 @@ class Program
         try
         {
             await app.StartAsync();
-            while (true)
-            {
-                Console.WriteLine("Waiting for connection...");
-                var client = await server.AcceptSocketAsync();
-                // HandleRequestAsync(client);
-                _ = HandleRequestAsync(client);
-            }
         }
         finally
         {
