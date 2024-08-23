@@ -1,7 +1,6 @@
 using codecrafters_redis.src;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Sockets;
-using System.Text;
 
 namespace codecrafters_redis;
 
@@ -9,32 +8,54 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        int portFlag = args.ToList().IndexOf("--port");
-        int replicaFlag = args.ToList().IndexOf("--replicaof");
+        RedisConfig config = new RedisConfig() ;
 
-        RedisConfig config;
-
-        if (portFlag > -1)
+        for (int i = 0; i < args.Length; i++)
         {
-            int port = int.Parse(args[portFlag + 1]);
-
-            if (replicaFlag > -1)
+            switch (args[i])
             {
-                string masterHost = args[replicaFlag + 1].Split(' ')[0];
-
-                int masterPort = int.Parse(args[replicaFlag + 1].Split(' ')[1]);
-
-                config = new RedisConfig("slave", port, masterPort, masterHost);
-            }
-            else
-            {
-                config = new RedisConfig(port);
+                case "--port":
+                    config.port = int.Parse(args[i + 1]);
+                    break;
+                case "--replicaof":
+                    config.role = "slave";
+                    string masterHost = args[i + 1].Split(' ')[0];
+                    int masterPort = int.Parse(args[i + 1].Split(' ')[1]);
+                    config.masterHost = masterHost;
+                    config.masterPort = masterPort;
+                    break;
+                default:
+                    break;
             }
         }
-        else
-        {
-            config = new RedisConfig();
-        }
+
+
+        //int portFlag = args.ToList().IndexOf("--port");
+        //int replicaFlag = args.ToList().IndexOf("--replicaof");
+
+        ////RedisConfig config;
+
+        //if (portFlag > -1)
+        //{
+        //    int port = int.Parse(args[portFlag + 1]);
+
+        //    if (replicaFlag > -1)
+        //    {
+        //        string masterHost = args[replicaFlag + 1].Split(' ')[0];
+
+        //        int masterPort = int.Parse(args[replicaFlag + 1].Split(' ')[1]);
+
+        //        config = new RedisConfig("slave", port, masterPort, masterHost);
+        //    }
+        //    else
+        //    {
+        //        config = new RedisConfig(port);
+        //    }
+        //}
+        //else
+        //{
+        //    config = new RedisConfig();
+        //}
 
 
         var serviceProvider = new ServiceCollection()
@@ -48,26 +69,27 @@ class Program
 
         TcpServer app = serviceProvider.GetRequiredService<TcpServer>();
 
-        
-        _ = Task.Run(async () => await app.StartAsync());
-
-        Console.WriteLine("######################################################## control reached here ########################################################");
-        if (config.role.Equals("slave"))
+        if (config.role == "slave")
         {
-            TcpClient? ConnectionWithMaster = await app.InitiateSlaveryAsync(
-                config.port, config.masterHost, config.masterPort
-            );
-            if (ConnectionWithMaster == null)
+            _ = Task.Run(async () => { await app.StartReplicaAsync(); });
+        }
+        ///////////////////////----------------------------------------aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        try
+        {
+            await app.StartAsync();
+            while (true)
             {
-                Console.WriteLine("Connection not established with master, please retry");
-                return;
-            }
-            else
-            {
-                //start receiving from master on different thread
-                _ = Task.Run(async () => await app.StartMasterPropagation(ConnectionWithMaster));
+                Console.WriteLine("Waiting for connection...");
+                var client = await server.AcceptSocketAsync();
+                // HandleRequestAsync(client);
+                _ = HandleRequestAsync(client);
             }
         }
+        finally
+        {
+            app._server.Stop();
+        }
+
 
     }
 

@@ -8,7 +8,7 @@ using System.Text;
 
 class TcpServer
 {
-    private readonly TcpListener _server;
+    public readonly TcpListener _server;
     private readonly RespParser _parser;
     private readonly CommandHandler _handler;
     private readonly RedisConfig _config;
@@ -36,7 +36,7 @@ class TcpServer
     {
         _server.Start();
 
-        Console.WriteLine("Server started...");
+        Console.WriteLine($"Server started at {_config.port}");
 
         while (true)
         {
@@ -52,36 +52,9 @@ class TcpServer
 
             _infra.clients.Add(client);
 
-            _ = Task.Run(() => HandleClientAsync(client));
+            HandleClientAsync(client);
         }
     }
-
-    public async Task StartMasterPropagation(TcpClient ConnectionWithMaster)
-    {
-        while (ConnectionWithMaster.Connected)
-        {
-            NetworkStream stream = ConnectionWithMaster.GetStream();
-
-            byte[] buffer = new byte[ConnectionWithMaster.ReceiveBufferSize];
-
-            stream.Read(buffer, 0, buffer.Length);
-
-            List<string[]> commands = _parser.Deserialize(buffer);
-            Console.WriteLine("commands from master: " + commands.Count + " **************************************************************************");
-
-            foreach (string[] command in commands)
-            {
-                Console.WriteLine("commands from master: ");
-                foreach (string c in command)
-                {
-                    Console.Write(c + " ");
-                }
-                Console.WriteLine();
-                string response = await _handler.HandleMasterCommands(command);
-            }
-        }
-    }
-
     public async Task HandleClientAsync(Client client)
     {
 
@@ -96,82 +69,84 @@ class TcpServer
             foreach (string[] command in commands)
             {
                 string response = await _handler.Handle(command, client);
-                if (
-                    client.ipAddress.Equals(_config.masterHost)
-                    && client.port == _config.masterPort
-                )
-                {
-                    //dont send to client when client writting to the instance is the master
-                    return;
-                }
                 client.Send(response);
             }
         }
 
     }
 
+    public async Task StartReplicaAsync()
+    {
+        TcpClient master = new TcpClient();
+
+        Console.WriteLine($"Server started at {_config.port}");
+        Console.WriteLine($"Replicating from {_config.masterHost}: {_config.masterPort}");
+        master.Connect(_config.masterHost, _config.masterPort);
+
+         await InitiateSlaveryAsync(master);
+        _ = StartMasterPropagation(master);
+    }
     //done by slave instace
     //dont need to create the slave object here
-    public async Task<TcpClient?> InitiateSlaveryAsync(int port, string masterHost, int masterPort)
+    public async Task InitiateSlaveryAsync(TcpClient client)
     {
-        TcpClient client = new TcpClient(masterHost, masterPort);
-
         NetworkStream stream = client.GetStream();
         StreamReader reader = new StreamReader(stream, Encoding.UTF8);
 
-
-
         string[] pingCommand = ["PING"];
-
-        stream.Write(Encoding.UTF8.GetBytes(_parser.RespArray(pingCommand)));
-
-        string response = reader.ReadLine();
-
+        Console.WriteLine($"Sending: {_parser.RespArray(pingCommand)}");
+        await stream.WriteAsync(Encoding.UTF8.GetBytes(_parser.RespArray(pingCommand)));
+        string response =await reader.ReadLineAsync();
         if (!"+PONG".Equals(response))
-            return null;
-
-
-
+            return ;
+        Console.WriteLine($"Response: {response}");
 
         string[] ReplconfPortCommand = ["REPLCONF", "listening-port", _config.port.ToString()];
-
-        stream.Write(Encoding.UTF8.GetBytes(_parser.RespArray(ReplconfPortCommand)));
-
-        response = reader.ReadLine();
-        Console.WriteLine("replconf response" + " " + response + " ******************************************");
-
+        Console.WriteLine($"Sending: {_parser.RespArray(ReplconfPortCommand)}");
+        await stream.WriteAsync(Encoding.UTF8.GetBytes(_parser.RespArray(ReplconfPortCommand)));
+        response = await reader.ReadLineAsync();
         if (!"+OK".Equals(response))
-            return null;
-
-
-
+            return ;
+        Console.WriteLine($"Response: {response}");
 
         string[] ReplconfCapaCommand = ["REPLCONF", "capa", "psync2"];
-
-        stream.Write(Encoding.UTF8.GetBytes(_parser.RespArray(ReplconfCapaCommand)));
-
-        response = reader.ReadLine();
-        Console.WriteLine("replconf response" + " " + response + " ******************************************");
-
+        Console.WriteLine($"Sending: {_parser.RespArray(ReplconfCapaCommand)}");
+        await stream.WriteAsync(Encoding.UTF8.GetBytes(_parser.RespArray(ReplconfCapaCommand)));
+        response = await reader.ReadLineAsync();
         if (!"+OK".Equals(response))
-            return null;
-
-
-
+            return ;
+        Console.WriteLine($"Response: {response}");
 
         string[] PsyncCommand = ["PSYNC", "?", "-1"];
+        Console.WriteLine($"Sending: {_parser.RespArray(PsyncCommand)}");
+        await stream.WriteAsync(Encoding.UTF8.GetBytes(_parser.RespArray(PsyncCommand)));
+        response = await reader.ReadLineAsync();
+        Console.WriteLine($"Response: {response}");
 
-        stream.Write(Encoding.UTF8.GetBytes(_parser.RespArray(PsyncCommand)));
-
-        response = reader.ReadLine();
-        Console.WriteLine("psync response" + " " + response + " ******************************************");
-
-        if (response == null || !"+FULLRESYNC".Equals(response.Substring(0, response.IndexOf(" "))))
-            return null;
+        //if (response == null || !"+FULLRESYNC".Equals(response.Substring(0, response.IndexOf(" "))))
+        //    return null;
 
         //do multi thread to listen from master
         Console.WriteLine("ready to process commands from master");
-        return client;
+    }
+
+    public async Task StartMasterPropagation(TcpClient ConnectionWithMaster)
+    {
+        while (ConnectionWithMaster.Connected)
+        {
+            NetworkStream stream = ConnectionWithMaster.GetStream();
+
+            byte[] buffer = new byte[ConnectionWithMaster.ReceiveBufferSize];
+
+            stream.Read(buffer, 0, buffer.Length);
+
+            List<string[]> commands = _parser.Deserialize(buffer);
+            
+            foreach (string[] command in commands)
+            {
+                string response = await _handler.HandleMasterCommands(command);
+            }
+        }
     }
 }
 
