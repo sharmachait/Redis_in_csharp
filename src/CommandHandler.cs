@@ -56,6 +56,7 @@ public class CommandHandler
         switch (cmd)
         {
             case "ping":
+                Console.WriteLine("pinged*************************************************************");
                 res = "+PONG\r\n";
                 break;
 
