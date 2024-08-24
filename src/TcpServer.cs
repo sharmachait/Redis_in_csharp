@@ -34,32 +34,24 @@ class TcpServer
 
     public async Task StartAsync()
     {
-        try
+        _server.Start();
+        Console.WriteLine($"Server started at {_config.port}");
+
+        while (true)
         {
-            _server.Start();
-            Console.WriteLine($"Server started at {_config.port}");
+            TcpClient socket = await _server.AcceptTcpClientAsync();
+            id++;
+            IPEndPoint? remoteIpEndPoint = socket.Client.RemoteEndPoint as IPEndPoint;
+            if (remoteIpEndPoint == null)
+                return;
 
-            while (true)
-            {
-                TcpClient socket = await _server.AcceptTcpClientAsync();
-                id++;
-                IPEndPoint? remoteIpEndPoint = socket.Client.RemoteEndPoint as IPEndPoint;
-                if (remoteIpEndPoint == null)
-                    return;
+            NetworkStream stream = socket.GetStream();
 
-                NetworkStream stream = socket.GetStream();
+            Client client = new Client(socket, remoteIpEndPoint, stream, id);
 
-                Client client = new Client(socket, remoteIpEndPoint, stream, id);
+            _infra.clients.Add(client);
 
-                _infra.clients.Add(client);
-
-                HandleClientAsync(client);
-            }
-        }
-        finally
-        {
-            Console.WriteLine("Closing server");
-            _server.Stop();
+            await HandleClientAsync(client);
         }
     }
     public async Task HandleClientAsync(Client client)
@@ -85,23 +77,13 @@ class TcpServer
     public async Task StartReplicaAsync()
     {
         TcpClient master = new TcpClient();
-        
-        try
-        {
 
-            Console.WriteLine($"Server started at {_config.port}");
-            Console.WriteLine($"Replicating from {_config.masterHost}: {_config.masterPort}");
-            master.Connect(_config.masterHost, _config.masterPort);
-            await InitiateSlaveryAsync(master);
-            _ = StartMasterPropagation(master);
-        }
-        finally
-        {
-            Console.WriteLine("Connections with master closed");
-            master.Close();
-            master.Dispose();
-        }
-        
+        Console.WriteLine($"Server started at {_config.port}");
+        Console.WriteLine($"Replicating from {_config.masterHost}: {_config.masterPort}");
+        master.Connect(_config.masterHost, _config.masterPort);
+        await InitiateSlaveryAsync(master);
+        await StartMasterPropagation(master);
+
     }
     //done by slave instace
     //dont need to create the slave object here
