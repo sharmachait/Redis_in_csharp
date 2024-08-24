@@ -145,7 +145,8 @@
 //            var socket = replica;
 //            if (socket.Connected)
 //            {
-//                _ = Task.Run(async () => {
+//                _ = Task.Run(async () =>
+//                {
 //                    await replica.SendAsync(
 //                        Encoding.ASCII.GetBytes(HandleRespArray(request)));
 //                });
@@ -201,7 +202,8 @@
 //    return true;
 //}
 
-//async Task<bool> HandleCommandResponse(string[] request, Socket client, byte[] byteData, bool IsMaster = false) {
+//async Task<bool> HandleCommandResponse(string[] request, Socket client, byte[] byteData, bool IsMaster = false)
+//{
 //    string reply = "-ERR unknown command\r\n";
 //    string json = JsonSerializer.Serialize(request);
 //    Console.WriteLine($"Received command: {json}");
