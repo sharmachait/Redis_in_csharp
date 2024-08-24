@@ -8,7 +8,7 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        RedisConfig config = new RedisConfig() ;
+        RedisConfig config = new RedisConfig();
 
         for (int i = 0; i < args.Length; i++)
         {
@@ -69,22 +69,19 @@ class Program
 
         TcpServer app = serviceProvider.GetRequiredService<TcpServer>();
 
-        
-        try
-        {
-            if (config.role == "slave")
-            {
-                _ = Task.Run(async () => { await app.StartReplicaAsync(); });
-            }
-            _ = Task.Run(async ()=> await app.StartAsync());
-            
-        }
-        finally
-        {
-            app._server.Stop();
-        }
 
+        var startTask = Task.Run(() => app.StartAsync());
 
+        // Conditionally start the replica on a different thread if required
+        if (config.role == "slave")
+        {
+            var startReplicaTask = Task.Run(() => app.StartReplicaAsync());
+            await Task.WhenAll(startTask, startReplicaTask);
+        }
+        else
+        {
+            await startTask;
+        }
     }
 
 }
