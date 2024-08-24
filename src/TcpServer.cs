@@ -121,17 +121,19 @@ class TcpServer
             return ;
         Console.WriteLine($"Response: {response}");
 
+        Console.WriteLine("ready to process commands from master");
+
         string[] PsyncCommand = ["PSYNC", "?", "-1"];
         Console.WriteLine($"Sending: {_parser.RespArray(PsyncCommand)}");
         await stream.WriteAsync(Encoding.UTF8.GetBytes(_parser.RespArray(PsyncCommand)));
-        response = await reader.ReadLineAsync();
-        Console.WriteLine($"Response: {response}");
+        //response = await reader.ReadLineAsync();
+        //Console.WriteLine($"Response: {response}");
 
-        //if (response == null || !"+FULLRESYNC".Equals(response.Substring(0, response.IndexOf(" "))))
-        //    return null;
+        ////if (response == null || !"+FULLRESYNC".Equals(response.Substring(0, response.IndexOf(" "))))
+        ////    return null;
 
-        //do multi thread to listen from master
-        Console.WriteLine("ready to process commands from master");
+        ////do multi thread to listen from master
+
     }
 
     public async Task StartMasterPropagation(TcpClient ConnectionWithMaster)
