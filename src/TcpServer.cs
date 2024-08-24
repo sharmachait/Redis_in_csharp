@@ -34,7 +34,7 @@ class TcpServer
 
     public async Task StartAsync()
     {
-        Console.WriteLine("started ************************************************************* tcpserver.cs");
+        //Console.WriteLine("started ************************************************************* tcpserver.cs");
         _server.Start();
         
         Console.WriteLine($"Server started at {_config.port}");
