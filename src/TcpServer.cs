@@ -2,6 +2,7 @@
 
 using codecrafters_redis.src;
 using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -34,7 +35,7 @@ class TcpServer
 
     public async Task StartAsync()
     {
-        //Console.WriteLine("started ************************************************************* tcpserver.cs");
+        Console.WriteLine("started ************************************************************* tcpserver.cs");
         _server.Start();
         
         Console.WriteLine($"Server started at {_config.port}");
@@ -53,7 +54,7 @@ class TcpServer
 
             _infra.clients.Add(client);
 
-            await HandleClientAsync(client);
+            _ = Task.Run(async () => await HandleClientAsync(client));
         }
     }
     public async Task HandleClientAsync(Client client)
@@ -61,20 +62,22 @@ class TcpServer
 
         while (client.socket.Connected)
         {
-            byte[] buffer = new byte[client.socket.ReceiveBufferSize];
-
-            await client.stream.ReadAsync(buffer);
-
-            List<string[]> commands = _parser.Deserialize(buffer);
-
-            foreach (string[] command in commands)
+            if (client.stream.DataAvailable)
             {
+                byte[] buffer = new byte[client.socket.ReceiveBufferSize];
+                int bytesRead = await client.stream.ReadAsync(buffer, 0, buffer.Length);
+                if (bytesRead > 0)
+                {
+                    List<string[]> commands = _parser.Deserialize(buffer);
 
-                string response = await _handler.Handle(command, client);
-                client.Send(response);
+                    foreach (string[] command in commands)
+                    {
+                        string response = await _handler.Handle(command, client);
+                        client.Send(response);
+                    }
+                }
             }
         }
-
     }
 
     public async Task StartReplicaAsync()
@@ -85,7 +88,7 @@ class TcpServer
         Console.WriteLine($"Replicating from {_config.masterHost}: {_config.masterPort}");
         master.Connect(_config.masterHost, _config.masterPort);
         await InitiateSlaveryAsync(master);
-        await StartMasterPropagation(master);
+        _ = Task.Run(async () => await StartMasterPropagation(master));
         
     }
     //done by slave instace
@@ -136,23 +139,27 @@ class TcpServer
 
     public async Task StartMasterPropagation(TcpClient ConnectionWithMaster)
     {
+        NetworkStream stream = ConnectionWithMaster.GetStream();
         while (ConnectionWithMaster.Connected)
         {
-            NetworkStream stream = ConnectionWithMaster.GetStream();
-
-            byte[] buffer = new byte[ConnectionWithMaster.ReceiveBufferSize];
-
-            stream.Read(buffer, 0, buffer.Length);
-
-            List<string[]> commands = _parser.Deserialize(buffer);
-            
-            foreach (string[] command in commands)
+            if (stream.DataAvailable)
             {
-                
-                string response = await _handler.HandleMasterCommands(command);
+                byte[] buffer = new byte[ConnectionWithMaster.ReceiveBufferSize];
+                int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+
+                if (bytesRead > 0)
+                {
+                    List<string[]> commands = _parser.Deserialize(buffer.Take(bytesRead).ToArray());
+
+                    foreach (string[] command in commands)
+                    {
+                        string response = await _handler.HandleMasterCommands(command);
+                    }
+                }
             }
         }
     }
+
 }
 
 
