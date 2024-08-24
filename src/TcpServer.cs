@@ -87,8 +87,8 @@ class TcpServer
         Console.WriteLine($"Replicating from {_config.masterHost}: {_config.masterPort}");
         master.Connect(_config.masterHost, _config.masterPort);
         await InitiateSlaveryAsync(master);
-        var startTask = Task.Run(() => StartMasterPropagation(master));
-        await Task.WhenAll(startTask);
+        await StartMasterPropagation(master);
+        
     }
     //done by slave instace
     //dont need to create the slave object here

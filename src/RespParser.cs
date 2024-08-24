@@ -30,8 +30,7 @@ public class RespParser
             res.Add(commandArray);
         }
 
-        if (res.Count == 0)
-            res.Add(new string[] { "No", "command" });
+        
 
         return res;
     }
