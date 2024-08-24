@@ -28,6 +28,7 @@ class TcpServer
 
         id = 0;
 
+
         _server = new TcpListener(IPAddress.Any, config.port);
     }
 
