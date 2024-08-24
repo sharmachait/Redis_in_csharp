@@ -28,7 +28,6 @@ class TcpServer
 
         id = 0;
 
-
         _server = new TcpListener(IPAddress.Any, config.port);
     }
 
@@ -36,7 +35,6 @@ class TcpServer
     public async Task StartAsync()
     {
         _server.Start();
-
         Console.WriteLine($"Server started at {_config.port}");
 
         while (true)
