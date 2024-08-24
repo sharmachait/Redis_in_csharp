@@ -81,6 +81,7 @@ class Program
         }
         else
         {
+            Console.WriteLine("started *************************************************************");
             await startTask;
         }
     }
