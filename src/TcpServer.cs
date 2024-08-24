@@ -86,9 +86,9 @@ class TcpServer
         Console.WriteLine($"Server started at {_config.port}");
         Console.WriteLine($"Replicating from {_config.masterHost}: {_config.masterPort}");
         master.Connect(_config.masterHost, _config.masterPort);
-        var handshakeTask = Task.Run(() => InitiateSlaveryAsync(master));
+        await InitiateSlaveryAsync(master);
         var startTask = Task.Run(() => StartMasterPropagation(master));
-        await Task.WhenAll(handshakeTask, startTask);
+        await Task.WhenAll(startTask);
     }
     //done by slave instace
     //dont need to create the slave object here
@@ -126,8 +126,8 @@ class TcpServer
         string[] PsyncCommand = ["PSYNC", "?", "-1"];
         Console.WriteLine($"Sending: {_parser.RespArray(PsyncCommand)}");
         await stream.WriteAsync(Encoding.UTF8.GetBytes(_parser.RespArray(PsyncCommand)));
-        response = await reader.ReadLineAsync();
-        Console.WriteLine($"Response: {response}");
+        //response = await reader.ReadLineAsync();
+        //Console.WriteLine($"Response: {response}");
 
         //if (response == null || !"+FULLRESYNC".Equals(response.Substring(0, response.IndexOf(" "))))
         //    return null;
