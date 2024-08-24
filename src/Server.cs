@@ -10,15 +10,15 @@ namespace codecrafters_redis;
 
 class Program
 {
-    ConcurrentBag<Socket> replicas = [];
-    int myPort = 6379;
-    string myRole = "master";
-    string isReplicaOf = "None";
-    string replicaId = "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb";
-    int replicaOffset = 0;
-    Dictionary<string, string> kv = new Dictionary<string, string>();
-    Dictionary<string, long> ttl = new Dictionary<string, long>();
-    async Task Main(string[] args)
+    static ConcurrentBag<Socket> replicas = [];
+    static int myPort = 6379;
+    static string myRole = "master";
+    static string isReplicaOf = "None";
+    static string replicaId = "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb";
+    static int replicaOffset = 0;
+    static Dictionary<string, string> kv = new Dictionary<string, string>();
+    static Dictionary<string, long> ttl = new Dictionary<string, long>();
+    static async Task Main(string[] args)
     {
 
         
@@ -64,7 +64,7 @@ class Program
         }
     }
 
-    async Task StartReplica()
+    static async Task StartReplica()
     {
         Console.WriteLine($"Replicating from {isReplicaOf}");
         // Connect to the master server
@@ -77,7 +77,7 @@ class Program
         _ = HandleRequestAsync(masterClient, IsMaster: true);
     }
 
-    async Task HandleHandshakeAsync(Socket client)
+    static async Task HandleHandshakeAsync(Socket client)
     {
         var handshakeParts = GetHandshakeParts();
         var buffer = new byte[1024];
@@ -103,7 +103,7 @@ class Program
         }
     }
 
-    string[] GetHandshakeParts()
+    static string[] GetHandshakeParts()
     {
         var lenListeningPort = myPort.ToString().Length;
         var listeningPort = myPort.ToString();
@@ -117,7 +117,7 @@ class Program
         return mystrings;
     }
 
-    async Task HandleRequestAsync(Socket client, bool IsMaster = false)
+    static async Task HandleRequestAsync(Socket client, bool IsMaster = false)
     {
         // client.SetSocketOption(SocketOptionLevel.Socket,
         // SocketOptionName.KeepAlive, true);
@@ -146,7 +146,7 @@ class Program
     }
 
 
-    void HandleReplicas(string[] request)
+    static void HandleReplicas(string[] request)
     {
         if (myRole == "master" && replicas.Count > 0)
         {
@@ -177,7 +177,7 @@ class Program
         }
     }
 
-    string HandleRespArray(string[] request)
+    static string HandleRespArray(string[] request)
     {
         int lengthRequestArray = (request.Length - 1) / 2;
         var outstr = "";
@@ -190,7 +190,7 @@ class Program
     }
 
 
-    async Task<bool> HandleCommandsResponse(Socket client, byte[] byteData,
+    static async Task<bool> HandleCommandsResponse(Socket client, byte[] byteData,
                                             int bytesRead, bool IsMaster = false)
     {
         var data = Encoding.ASCII.GetString(byteData, 0, bytesRead);
@@ -212,7 +212,7 @@ class Program
         return true;
     }
 
-    async Task<bool> HandleCommandResponse(string[] request, Socket client, byte[] byteData, bool IsMaster = false)
+    static async Task<bool> HandleCommandResponse(string[] request, Socket client, byte[] byteData, bool IsMaster = false)
     {
         string reply = "-ERR unknown command\r\n";
         string json = JsonSerializer.Serialize(request);
@@ -270,8 +270,8 @@ class Program
             await client.SendAsync(Encoding.ASCII.GetBytes(reply));
         return true;
     }
-    string EncodeString(string str) { return $"${str.Length}\r\n{str}\r\n"; }
-    string HandleInfo(string[] request)
+    static string EncodeString(string str) { return $"${str.Length}\r\n{str}\r\n"; }
+    static string HandleInfo(string[] request)
     {
         var values = new Dictionary<string, string> { { "role", myRole },
                                                 { "replicaof", isReplicaOf },
@@ -288,7 +288,7 @@ class Program
         }
         return EncodeString(msgString);
     }
-    string HandleGet(string[] request)
+    static string HandleGet(string[] request)
     {
         string reply = "-ERR unknown command\r\n";
         if (kv.ContainsKey(request[4]))
@@ -323,11 +323,11 @@ class Program
         }
         return reply;
     }
-    long GetEpochNow()
+    static long GetEpochNow()
     {
         return (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
     }
-    string HandleSet(string[] request)
+    static string HandleSet(string[] request)
     {
         if (request.Length >= 10 && request[8].ToLower() == "px")
         {
