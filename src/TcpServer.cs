@@ -67,11 +67,7 @@ class TcpServer
 
             foreach (string[] command in commands)
             {
-                Console.WriteLine("Command received from client");
-                foreach(string c in command)
-                {
-                    Console.Write(c+" ");
-                }
+
                 string response = await _handler.Handle(command, client);
                 client.Send(response);
             }
@@ -150,11 +146,7 @@ class TcpServer
             
             foreach (string[] command in commands)
             {
-                Console.WriteLine("Command received from master");
-                foreach (string c in command)
-                {
-                    Console.Write(c + " ");
-                }
+                
                 string response = await _handler.HandleMasterCommands(command);
             }
         }
