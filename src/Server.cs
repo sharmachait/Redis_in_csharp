@@ -81,7 +81,7 @@ class Program
         }
         else
         {
-            //Console.WriteLine($"Server starting at {config.port}*********************************** server.cs");
+            Console.WriteLine($"Server starting at {config.port}*********************************** server.cs");
             await startTask;
         }
     }
