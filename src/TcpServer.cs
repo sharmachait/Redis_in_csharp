@@ -27,8 +27,8 @@ class TcpServer
         _infra = infra;
 
         id = 0;
-
-        _server = new TcpListener(IPAddress.IPv6Any, _config.port);
+        _server = new TcpListener(IPAddress.Any, _config.port);
+        //_server = new TcpListener(IPAddress.IPv6Any, _config.port);
     }
 
 
@@ -36,8 +36,8 @@ class TcpServer
     {
         _server.Start();
 
-        Socket underlyingSocket = _server.Server;
-        underlyingSocket.DualMode = true;
+        //Socket underlyingSocket = _server.Server;
+        //underlyingSocket.DualMode = true;
 
         Console.WriteLine($"Server started at {_config.port}");
 
