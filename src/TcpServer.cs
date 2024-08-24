@@ -148,6 +148,11 @@ class TcpServer
             
             foreach (string[] command in commands)
             {
+                Console.WriteLine("Command received from master");
+                foreach (string c in command)
+                {
+                    Console.Write(c + " ");
+                }
                 string response = await _handler.HandleMasterCommands(command);
             }
         }
