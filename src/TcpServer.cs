@@ -28,13 +28,16 @@ class TcpServer
 
         id = 0;
 
-        _server = new TcpListener(IPAddress.Any, config.port);
+        _server = new TcpListener(IPAddress.IPv6Any, _config.port);
     }
 
 
     public async Task StartAsync()
     {
         _server.Start();
+
+        Socket underlyingSocket = _server.Server;
+        underlyingSocket.DualMode = true;
 
         Console.WriteLine($"Server started at {_config.port}");
 
