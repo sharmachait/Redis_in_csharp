@@ -2,7 +2,7 @@
   "profiles": {
     "codecrafters-redis": {
       "commandName": "Project",
-      "commandLineArgs": "--port 6379"
+      "commandLineArgs": "--port 8000 --replicaof \"localhost 6379\""
     }
   }
 }
