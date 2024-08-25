@@ -15,3 +15,8 @@ $response = $reader.ReadLine()
 
 # Output the server's response
 Write-Host "Server Response: $response"
+
+# Clean up and close the connection
+$reader.Close()
+$writer.Close()
+$client.Close()

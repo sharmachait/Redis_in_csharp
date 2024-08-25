@@ -127,8 +127,8 @@ class TcpServer
         string[] PsyncCommand = ["PSYNC", "?", "-1"];
         Console.WriteLine($"Sending: {_parser.RespArray(PsyncCommand)}");
         await stream.WriteAsync(Encoding.UTF8.GetBytes(_parser.RespArray(PsyncCommand)));
-        //response = await reader.ReadLineAsync();
-        //Console.WriteLine($"Response: {response}");
+        response = await reader.ReadLineAsync();
+        Console.WriteLine($"Response: {response}");
 
         //if (response == null || !"+FULLRESYNC".Equals(response.Substring(0, response.IndexOf(" "))))
         //    return null;
