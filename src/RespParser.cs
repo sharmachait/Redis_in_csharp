@@ -12,7 +12,7 @@ public class RespParser
     public List<string[]> Deserialize(byte[] command)
     {
         string _data = Encoding.UTF8.GetString(command);
-        Console.WriteLine(_data);
+        Console.WriteLine(_data.Replace("\r\n", "\\r\\n"));
         _data = _data.Substring(0, _data.IndexOf('\0'));
 
         string[] commands = _data.Split('*');
